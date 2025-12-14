@@ -29,7 +29,7 @@ class HomeScreen extends ConsumerWidget {
                 itemBuilder: (ctx, i) => EntryTile(entries[i]),
               ),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_,_) => const Center(child: Text('Error loading data')),
+        error: (_, _) => const Center(child: Text('Error loading data')),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddSheet(context, ref),
@@ -69,7 +69,7 @@ class EntryTile extends StatelessWidget {
                 ),
               )
             : null,
-        onLongPress: ()=>SnackBar(content: Text("Loading..."),),
+        onLongPress: () => SnackBar(content: Text("Loading...")),
       ),
     );
   }
@@ -80,7 +80,7 @@ class FullPhotoScreen extends StatelessWidget {
   const FullPhotoScreen(this.path, {super.key});
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(),
+    appBar: AppBar(title: Text(path)),
     body: Center(child: Image.file(File(path))),
   );
 }
@@ -182,7 +182,15 @@ class _CameraScreenState extends State<CameraScreen> {
   void initState() {
     super.initState();
     _controller = CameraController(widget.camera, ResolutionPreset.high);
-    _controller.initialize().then((_) => setState(() {}));
+    _controller.initialize().then((_) => setState(() {})).onError((e, _) {
+
+      SnackBar(
+        content: Text(
+          "An exception occurred $e",
+          style: TextStyle(color: Colors.red),
+        ),
+      );
+    });
   }
 
   @override
