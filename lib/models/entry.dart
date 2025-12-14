@@ -1,13 +1,13 @@
-import 'package:isar/isar.dart';
-part 'entry.g.dart';  // ← will be generated
+import 'package:isar_plus/isar_plus.dart';
+part 'entry.g.dart'; // ← will be generated
 
 @collection
 class Entry {
-  Id id = Isar.autoIncrement;
-
-  @Index(type: IndexType.value)
+  Entry(this.id);
+  final int id;
+  @Index()
   late DateTime createdAt;
 
   String? text;
-  String? photoPath;   // local file path
+  String? photoPath; // local file path
 }
