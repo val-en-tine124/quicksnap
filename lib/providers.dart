@@ -1,5 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:isar/isar.dart';
+import 'package:isar_plus/isar_plus.dart';
 import 'db.dart';
 import 'models/entry.dart';
 
@@ -14,11 +15,18 @@ class _AddEntry {
   _AddEntry(this.ref);
 
   Future<void> call({String? text, String? photoPath}) async {
-    final entry = Entry()
+    final entry = Entry(isar.entrys.autoIncrement())
       ..createdAt = DateTime.now()
       ..text = text?.trim().isNotEmpty == true ? text : null
       ..photoPath = photoPath;
-
-    await isar.writeTxn(() => isar.entrys.put(entry));
+    if (kIsWeb) {
+      isar.write((isar) {
+        isar.entrys.put(entry);
+        return;
+      });
+    }
+    await isar.writeAsync((isar) async {
+      isar.entrys.put(entry);
+    });
   }
 }
