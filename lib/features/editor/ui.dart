@@ -13,7 +13,7 @@ class EditorScalfold extends ConsumerWidget {
     );
   }
 }
-
+///This is My app Editor
 class _Editor extends ConsumerStatefulWidget {
   const _Editor();
   @override
@@ -34,8 +34,14 @@ class _EditorState extends ConsumerState<_Editor> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        QuillSimpleToolbar(controller: _controller),
-        Expanded(child: QuillEditor.basic(controller: _controller)),
+        Expanded(
+          child: QuillEditor.basic(
+            controller: _controller,
+            config: QuillEditorConfig(autoFocus: true),
+          ),
+        ),
+
+        _EditorToolBar(_controller),
       ],
     );
   }
@@ -44,5 +50,24 @@ class _EditorState extends ConsumerState<_Editor> {
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+}
+
+///This is the toolar that should be 
+///at the bottom of the screen or ontop of the keyboard on mobile devices.
+class _EditorToolBar extends StatelessWidget {
+  const _EditorToolBar(this.controller);
+  final QuillController controller;
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Container(
+        decoration: BoxDecoration(color: Theme.of(context).canvasColor,boxShadow: [BoxShadow(color: Colors.black12,blurRadius: 4.0)]),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: QuillSimpleToolbar(controller: controller),
+        ),
+      ),
+    );
   }
 }
