@@ -42,6 +42,7 @@ class HomeScreen extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       builder: (_) => AddEntrySheet(ref: ref),
     );
   }
@@ -114,54 +115,53 @@ class _AddEntrySheetState extends ConsumerState<AddEntrySheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return AnimatedPadding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
-      child: DraggableScrollableSheet(
-        expand: false,
-        builder: (_, controller) => Column(
-          children: [
-            const Padding(
-              padding: EdgeInsets.all(16),
-              child: Text(
-                'New memory',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      duration: const Duration(milliseconds: 200),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text(
+              'New memory',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: TextField(
+              controller: textController,
+              decoration: const InputDecoration(
+                hintText: 'What’s on your mind?',
               ),
+              maxLines: 4,
             ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: TextField(
-                controller: textController,
-                decoration: const InputDecoration(
-                  hintText: 'What’s on your mind?',
-                ),
-                maxLines: 4,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton.icon(
+                onPressed: _takePhoto,
+                icon: const Icon(Icons.camera_alt),
+                label: const Text('Snap Photo'),
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: _takePhoto,
-                  icon: const Icon(Icons.camera_alt),
-                  label: const Text('Snap Photo'),
-                ),
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    await widget.ref.read(addEntryProvider)(
-                      text: textController.text,
-                    );
-                    if (mounted) Navigator.pop(context);
-                  },
-                  icon: const Icon(Icons.save),
-                  label: const Text('Save Text'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 40),
-          ],
-        ),
+              ElevatedButton.icon(
+                onPressed: () async {
+                  await widget.ref.read(addEntryProvider)(
+                    text: textController.text,
+                  );
+                  if (mounted) Navigator.pop(context);
+                },
+                icon: const Icon(Icons.save),
+                label: const Text('Save Text'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 40),
+        ],
       ),
     );
   }
@@ -183,7 +183,6 @@ class _CameraScreenState extends State<CameraScreen> {
     super.initState();
     _controller = CameraController(widget.camera, ResolutionPreset.high);
     _controller.initialize().then((_) => setState(() {})).onError((e, _) {
-
       SnackBar(
         content: Text(
           "An exception occurred $e",
