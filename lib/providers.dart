@@ -9,6 +9,7 @@ final entriesProvider = StreamProvider<List<Entry>>((ref) {
 });
 
 final addEntryProvider = Provider((ref) => _AddEntry(ref));
+final removeEntryProvider = Provider((ref)=> _RemoveEntry(ref));
 
 class _AddEntry {
   final Ref ref;
@@ -27,6 +28,21 @@ class _AddEntry {
     }
     await isar.writeAsync((isar) async {
       isar.entrys.put(entry);
+    });
+  }
+}
+
+class _RemoveEntry{
+  final Ref ref;
+  _RemoveEntry(this.ref);
+  Future<void> call({String? text, String? photoPath}) async {
+    if (kIsWeb){
+      isar.write((isar) {
+      isar.entrys.where().textEqualTo(text).and().photoPathEqualTo(photoPath).deleteAll();  
+      });
+    }
+    await isar.writeAsync((isar)async{
+      isar.entrys.where().textEqualTo(text).and().photoPathEqualTo(photoPath).deleteAll();
     });
   }
 }
