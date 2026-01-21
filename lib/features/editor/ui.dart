@@ -1,6 +1,7 @@
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
+late QuillController _controller;
 
 class EditorScalfold extends ConsumerWidget {
   const EditorScalfold({super.key});
@@ -13,6 +14,7 @@ class EditorScalfold extends ConsumerWidget {
     );
   }
 }
+
 ///This is My app Editor
 class _Editor extends ConsumerStatefulWidget {
   const _Editor();
@@ -23,7 +25,7 @@ class _Editor extends ConsumerStatefulWidget {
 }
 
 class _EditorState extends ConsumerState<_Editor> {
-  late QuillController _controller;
+  
   @override
   void initState() {
     super.initState();
@@ -53,7 +55,7 @@ class _EditorState extends ConsumerState<_Editor> {
   }
 }
 
-///This is the toolar that should be 
+///This is the toolar that should be
 ///at the bottom of the screen or ontop of the keyboard on mobile devices.
 class _EditorToolBar extends StatelessWidget {
   const _EditorToolBar(this.controller);
@@ -62,7 +64,10 @@ class _EditorToolBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Container(
-        decoration: BoxDecoration(color: Theme.of(context).canvasColor,boxShadow: [BoxShadow(color: Colors.black12,blurRadius: 4.0)]),
+        decoration: BoxDecoration(
+          color: Theme.of(context).canvasColor,
+          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4.0)],
+        ),
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: QuillSimpleToolbar(controller: controller),
@@ -71,3 +76,4 @@ class _EditorToolBar extends StatelessWidget {
     );
   }
 }
+
