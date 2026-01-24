@@ -48,7 +48,7 @@ class QuickSnapApp extends StatelessWidget {
       ],
       supportedLocales: const [Locale('en')],
 
-      home: EditorScalfold(),
+      home: EditorScaffold(),
     );
   }
 }
