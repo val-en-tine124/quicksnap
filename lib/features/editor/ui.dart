@@ -122,21 +122,27 @@ class DrawerFsOps extends StatelessWidget {
         onTap: () {},
         leading: const Icon(Icons.add),
         title: const Text("New File"),
+        trailing: const Icon(Icons.arrow_forward_ios),
+        
       ),
       ListTile(
         onTap: () {},
         leading: const Icon(Icons.save),
         title: const Text("Save File"),
+        trailing: const Icon(Icons.arrow_forward_ios),
       ),
       ListTile(
         onTap: () {},
         leading: const Icon(Icons.folder_open),
         title: const Text("Open File"),
+        trailing: const Icon(Icons.arrow_forward_ios),
+
       ),
       ListTile(
         onTap: () {},
         leading: const Icon(Icons.delete),
         title: const Text("Delete File"),
+        trailing: const Icon(Icons.arrow_forward_ios),
       ),
     ];
     return ListView(
