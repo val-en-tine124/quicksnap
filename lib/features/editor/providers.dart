@@ -27,11 +27,12 @@ class FilePickerNotifier extends AsyncNotifier<PlatformFile?> {
         state = AsyncData(null); // User canceled the picker
       }
     } on Exception catch (e) {
-      state = AsyncError(e, StackTrace.current);
+      state = AsyncError(e, StackTrace.current); // File picker failed with an exception
     }
   }
 
   Future<void> deleteFile() async {
+    state = AsyncLoading(); // File delete started
     final stateValue = state.value;
     if (stateValue != null) {
       final stateValuePath = stateValue.path;
@@ -40,8 +41,9 @@ class FilePickerNotifier extends AsyncNotifier<PlatformFile?> {
 
         try {
           await handle.delete();
+          state = AsyncData(null); // File delete has been completed
         } on Exception catch (e) {
-          state = AsyncError(e, StackTrace.current);
+          state = AsyncError(e, StackTrace.current); // Error on file delete
         }
       }
     }
