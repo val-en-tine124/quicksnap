@@ -1,52 +1,24 @@
-import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:quicksnap/features/editor/providers.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-
-final quillControllerProvider = Provider.autoDispose<QuillController>((ref) {
-  final _controller = QuillController.basic(); // Basic controller
-  ref.onDispose(() {
-    // Dispose the controller when the provider is disposed
-    _controller.dispose();
-  });
-  return _controller;
-});
 
 class EditorScaffold extends ConsumerWidget {
   const EditorScaffold({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final fileData = ref.watch(filePickerProvider);
+    final fileData = ref.watch(appBarTitleProvider);
 
-    return fileData.when(
-      data: (data) {
-        final appBarTitle = data?.name ?? "Untitled Document";
-        return Scaffold(
-          appBar: AppBar(title: RepaintBoundary(child: Text(appBarTitle))),
-          body: _Editor(),
-          drawer: Drawer(child: Center(child: const DrawerFsOps())),
-        );
-      },
-      loading: () => Scaffold(
-        appBar: AppBar(title: const Text('Loading...')),
-        body: const Center(child: CircularProgressIndicator()),
+    return Scaffold(
+      appBar: AppBar(
+        title: RepaintBoundary(
+          child: Text(fileData, style: TextStyle(fontSize: 16)),
+        ),
       ),
-      error: (error, stack) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error: $error'),
-              duration: const Duration(seconds: 7),
-            ),
-          );
-        });
-        return Scaffold(
-          appBar: AppBar(title: const Text('Error')),
-          body: Center(child: Text('Error: $error')),
-        );
-      },
+      body: _Editor(),
+      drawer: Drawer(child: Center(child: const DrawerFsOps())).animate().shimmer().then().fadeIn(),
     );
   }
 }
@@ -61,7 +33,6 @@ class _Editor extends ConsumerStatefulWidget {
 }
 
 class _EditorState extends ConsumerState<_Editor> {
-
   @override
   void initState() {
     super.initState();
@@ -112,18 +83,38 @@ class _EditorToolBar extends StatelessWidget {
   }
 }
 
-class DrawerFsOps extends StatelessWidget {
+class DrawerFsOps extends ConsumerWidget {
   const DrawerFsOps({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final fileData = ref.read(filePickerProvider.notifier);
     final fileOpsButtons = <Widget>[
       ListTile(
-        onTap: () {},
+        onTap: () {
+          fileData.newFile();
+          ref
+              .read(filePickerProvider)
+              .when(
+                data: (data) {},
+                error: (e, s) =>
+                    customScaffoldMessenger(context, Text("Error: $e")),
+                loading: () => Center(
+                  child: Column(
+                    children: [
+                      CircularProgressIndicator(),
+                      Padding(
+                        padding: EdgeInsetsGeometry.all(4),
+                        child: Text("Creating an empty file ..."),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+        }, //TODO
         leading: const Icon(Icons.add),
         title: const Text("New File"),
         trailing: const Icon(Icons.arrow_forward_ios),
-        
       ),
       ListTile(
         onTap: () {},
@@ -132,32 +123,46 @@ class DrawerFsOps extends StatelessWidget {
         trailing: const Icon(Icons.arrow_forward_ios),
       ),
       ListTile(
-        onTap: () {},
+        onTap: () async {
+          await fileData.pickFile();
+          if (context.mounted) return;
+          ref
+              .read(filePickerProvider)
+              .when(
+                data: (data) => customScaffoldMessenger(
+                  context,
+                  Text("Opened file successfully: ${data?.name}"),
+                ),
+                error: (e, s) =>
+                    customScaffoldMessenger(context, Text("Error: $e")),
+                loading: () {},
+              );
+        },
         leading: const Icon(Icons.folder_open),
         title: const Text("Open File"),
-        trailing: const Icon(Icons.arrow_forward_ios),
-
-      ),
-      ListTile(
-        onTap: () {},
-        leading: const Icon(Icons.delete),
-        title: const Text("Delete File"),
         trailing: const Icon(Icons.arrow_forward_ios),
       ),
     ];
     return ListView(
-      children: [DrawerHeader(
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-              ),
-              child: Center(
-                child: Text(
-                  'QuickSnap',
-                  style: TextStyle(
-                    fontSize: 24,)).animate().fadeIn(duration: 4.seconds).then().effect().shake(),
-              )),
-                  ...fileOpsButtons.map((entry) => entry),
-    ],
+      children: [
+        DrawerHeader(
+          decoration: BoxDecoration(color: Theme.of(context).primaryColor),
+          child: Center(
+            child: Text(
+              'QuickSnap',
+              style: TextStyle(fontSize: 24),
+            ).animate().fadeIn(duration: 4.seconds).then().effect().shake(),
+          ),
+        ),
+        ...fileOpsButtons.map((entry) => entry),
+      ],
     );
   }
+}
+
+ScaffoldFeatureController<SnackBar, SnackBarClosedReason>
+customScaffoldMessenger(BuildContext context, Text content) {
+  return ScaffoldMessenger.of(
+    context,
+  ).showSnackBar(SnackBar(content: content, duration: 7.seconds));
 }
