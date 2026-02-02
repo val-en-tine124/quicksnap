@@ -1,48 +1,47 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:isar_plus/isar_plus.dart';
-import 'db.dart';
-import 'models/entry.dart';
+// import 'package:flutter/foundation.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'db.dart';
+// import 'models/entry.dart';
 
-final entriesProvider = StreamProvider<List<Entry>>((ref) {
-  return isar.entrys.where().sortByCreatedAtDesc().watch(fireImmediately: true);
-});
+// final entriesProvider = StreamProvider<List<Entry>>((ref) {
+//   return isar.entrys.where().sortByCreatedAtDesc().watch(fireImmediately: true);
+// });
 
-final addEntryProvider = Provider((ref) => _AddEntry(ref));
-final removeEntryProvider = Provider((ref)=> _RemoveEntry(ref));
+// final addEntryProvider = Provider((ref) => _AddEntry(ref));
+// final removeEntryProvider = Provider((ref)=> _RemoveEntry(ref));
 
-class _AddEntry {
-  final Ref ref;
-  _AddEntry(this.ref);
+// class _AddEntry {
+//   final Ref ref;
+//   _AddEntry(this.ref);
 
-  Future<void> call({String? text, String? photoPath}) async {
-    final entry = Entry(isar.entrys.autoIncrement())
-      ..createdAt = DateTime.now()
-      ..text = text?.trim().isNotEmpty == true ? text : null
-      ..photoPath = photoPath;
-    if (kIsWeb) {
-      isar.write((isar) {
-        isar.entrys.put(entry);
-        return;
-      });
-    }
-    await isar.writeAsync((isar) async {
-      isar.entrys.put(entry);
-    });
-  }
-}
+//   Future<void> call({String? text, String? photoPath}) async {
+//     final entry = Entry(isar.entrys.autoIncrement())
+//       ..createdAt = DateTime.now()
+//       ..text = text?.trim().isNotEmpty == true ? text : null
+//       ..photoPath = photoPath;
+//     if (kIsWeb) {
+//       isar.write((isar) {
+//         isar.entrys.put(entry);
+//         return;
+//       });
+//     }
+//     await isar.writeAsync((isar) async {
+//       isar.entrys.put(entry);
+//     });
+//   }
+// }
 
-class _RemoveEntry{
-  final Ref ref;
-  _RemoveEntry(this.ref);
-  Future<void> call({String? text, String? photoPath}) async {
-    if (kIsWeb){
-      isar.write((isar) {
-      isar.entrys.where().textEqualTo(text).and().photoPathEqualTo(photoPath).deleteAll();  
-      });
-    }
-    await isar.writeAsync((isar)async{
-      isar.entrys.where().textEqualTo(text).and().photoPathEqualTo(photoPath).deleteAll();
-    });
-  }
-}
+// class _RemoveEntry{
+//   final Ref ref;
+//   _RemoveEntry(this.ref);
+//   Future<void> call({String? text, String? photoPath}) async {
+//     if (kIsWeb){
+//       isar.write((isar) {
+//       isar.entrys.where().textEqualTo(text).and().photoPathEqualTo(photoPath).deleteAll();  
+//       });
+//     }
+//     await isar.writeAsync((isar)async{
+//       isar.entrys.where().textEqualTo(text).and().photoPathEqualTo(photoPath).deleteAll();
+//     });
+//   }
+// }
