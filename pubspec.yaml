@@ -39,8 +39,6 @@ dependencies:
   camera: ^0.11.3
   flutter_secure_storage: ^10.0.0
   intl: ^0.20.2
-  isar_plus: ^1.1.9
-  isar_plus_flutter_libs: ^1.1.9
   flutter_multi_select_items: ^0.4.3
   flutter_quill: ^11.5.0
   flutter_localizations:
