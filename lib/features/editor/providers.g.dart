@@ -8,6 +8,63 @@ part of 'providers.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// This is a provider for the text eiditor loading state
+
+@ProviderFor(EditorIsLoading)
+final editorIsLoadingProvider = EditorIsLoadingProvider._();
+
+/// This is a provider for the text editor loading state
+final class EditorIsLoadingProvider
+    extends $NotifierProvider<EditorIsLoading, bool> {
+  /// This is a provider for the text eiditor loading state
+  EditorIsLoadingProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'editorIsLoadingProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$editorIsLoadingHash();
+
+  @$internal
+  @override
+  EditorIsLoading create() => EditorIsLoading();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$editorIsLoadingHash() => r'6110eaac41e19e2764cfde626309c4a552373756';
+
+/// This is a provider for the text eiditor loading state
+
+abstract class _$EditorIsLoading extends $Notifier<bool> {
+  bool build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<bool, bool>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<bool, bool>,
+              bool,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
 
 @ProviderFor(AppBarTitle)
 final appBarTitleProvider = AppBarTitleProvider._();
@@ -40,7 +97,7 @@ final class AppBarTitleProvider extends $NotifierProvider<AppBarTitle, String> {
   }
 }
 
-String _$appBarTitleHash() => r'3c944e727c6d54635aaaaa37c23e29c538223545';
+String _$appBarTitleHash() => r'066492e1f1409edb45a742045e43bd887535bf2b';
 
 abstract class _$AppBarTitle extends $Notifier<String> {
   String build();
@@ -89,7 +146,7 @@ final class FilePickerNotifierProvider
 }
 
 String _$filePickerNotifierHash() =>
-    r'ac92e92a91ce0eb2771b27508e3f098b192d6b51';
+    r'd142584848a95a9b2824621320d797645f9587f4';
 
 ///This notifier contains methods for various file operation.
 

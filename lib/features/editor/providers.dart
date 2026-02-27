@@ -7,6 +7,17 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:file_picker/file_picker.dart';
 part "providers.g.dart";
 
+/// This is a provider for the text editor loading state.
+/// It return a boolean.
+@riverpod
+class EditorIsLoading extends _$EditorIsLoading {
+  @override
+  bool build() => false;
+
+  void loading() => state = true;
+  void stoploading() => state = false;
+}
+
 @riverpod
 class AppBarTitle extends _$AppBarTitle {
   @override
@@ -50,6 +61,7 @@ class FilePickerNotifier extends AsyncNotifier<PlatformFile?> {
       );
 
       if (result != null && result.files.isNotEmpty) {
+        //make sure the file picker picked a file.
         final firstFile = result.files.first;
         final delta = await Isolate.run(() async {
           final handle = File(firstFile.path!);
@@ -59,15 +71,16 @@ class FilePickerNotifier extends AsyncNotifier<PlatformFile?> {
           return delta;
         });
         final editorController = ref.read(quillControllerProvider);
+        ref.read(editorIsLoadingProvider.notifier).loading(); // Delibrate use of ref.watch to trigger rebuild on state change
         editorController.document.replace(
           0,
           editorController.document.length,
           delta,
         );
-
         state = AsyncData(firstFile);
+        ref.read(editorIsLoadingProvider.notifier).stoploading();
       } else {
-        state = AsyncData(null); // User canceled the picker
+        state = AsyncData(null); // User cancelled the picker
       }
     } on Exception catch (e) {
       state = AsyncError(

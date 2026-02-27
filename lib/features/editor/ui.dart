@@ -10,6 +10,7 @@ class EditorScaffold extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final fileData = ref.watch(appBarTitleProvider);
+    final editorIsLoading = ref.watch(editorIsLoadingProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -17,8 +18,10 @@ class EditorScaffold extends ConsumerWidget {
           child: Text(fileData, style: TextStyle(fontSize: 16)),
         ),
       ),
-      body: _Editor(),
-      drawer: Drawer(child: Center(child: const DrawerFsOps())).animate().shimmer().then().fadeIn(),
+      body: editorIsLoading
+          ? const Center(child: CircularProgressIndicator())
+          : const _Editor(),
+      drawer: Drawer(child: Center(child: const DrawerFsOps())),
     );
   }
 }
@@ -125,7 +128,8 @@ class DrawerFsOps extends ConsumerWidget {
       ListTile(
         onTap: () async {
           await fileData.pickFile();
-          if (context.mounted) return;
+          if (!context.mounted) return;
+          Navigator.pop(context);
           ref
               .read(filePickerProvider)
               .when(
