@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 import 'package:flutter_quill/quill_delta.dart';
@@ -23,7 +24,7 @@ class AppBarTitle extends _$AppBarTitle {
   @override
   String build() {
     final fileData = ref.watch(filePickerProvider);
-    final appBarTitle = fileData.value?.name ?? "Untitled Document";
+    var appBarTitle = fileData.value?.name ?? "Untitled Document";
     return appBarTitle;
   }
 
@@ -52,7 +53,7 @@ class FilePickerNotifier extends AsyncNotifier<PlatformFile?> {
   }
 
   Future<void> pickFile() async {
-    state = AsyncLoading();
+    state = const AsyncLoading();
     try {
       final result = await FilePicker.platform.pickFiles(
         dialogTitle: "Select a QuickSnap text file",
@@ -71,7 +72,7 @@ class FilePickerNotifier extends AsyncNotifier<PlatformFile?> {
           return delta;
         });
         final editorController = ref.read(quillControllerProvider);
-        ref.read(editorIsLoadingProvider.notifier).loading(); // Delibrate use of ref.watch to trigger rebuild on state change
+        ref.read(editorIsLoadingProvider.notifier).loading();
         editorController.document.replace(
           0,
           editorController.document.length,
@@ -80,7 +81,7 @@ class FilePickerNotifier extends AsyncNotifier<PlatformFile?> {
         state = AsyncData(firstFile);
         ref.read(editorIsLoadingProvider.notifier).stoploading();
       } else {
-        state = AsyncData(null); // User cancelled the picker
+        state = const AsyncData(null); // User cancelled the picker
       }
     } on Exception catch (e) {
       state = AsyncError(
@@ -91,9 +92,56 @@ class FilePickerNotifier extends AsyncNotifier<PlatformFile?> {
   }
 
   void newFile() {
-    state = AsyncLoading();
+    state = const AsyncLoading();
     //ref.read(appBarTitleProvider.notifier).resetTitle();
     ref.read(quillControllerProvider).clear();
-    state = AsyncData(null);
+    state = const AsyncData(null);
+  }
+
+  Future<void> saveFile() async {
+    final editorController = ref.read(quillControllerProvider);
+    final documentAsText = editorController.document.toPlainText();
+    final currentFileState = state;
+
+    state = const AsyncLoading();
+
+    try {
+      final fileToSave = currentFileState.value;
+      if (fileToSave != null) {
+        // Overwrite existing file
+        final file = File(fileToSave.path!);
+        await file.writeAsString(documentAsText);
+        // Create a new PlatformFile with updated size
+        final updatedFile = PlatformFile(
+            name: fileToSave.name,
+            path: fileToSave.path,
+            size: await file.length());
+        state = AsyncData(updatedFile);
+      } else {
+        // "Save As" a new file
+        final newPath = await FilePicker.platform.saveFile(
+          type: FileType.custom,
+          fileName: "untitled.txt",
+          allowedExtensions: ["txt", "log"],
+          bytes: utf8.encode(documentAsText),
+        );
+
+        if (newPath != null) {
+          // If user saved the file, update the state with the new file info
+          final file = File(newPath);
+          final newPlatformFile = PlatformFile(
+            name: file.path.split(Platform.pathSeparator).last,
+            path: file.path,
+            size: await file.length(),
+          );
+          state = AsyncData(newPlatformFile);
+        } else {
+          // User cancelled the "Save As" dialog, restore the previous state
+          state = currentFileState;
+        }
+      }
+    } catch (e, s) {
+      state = AsyncError(e, s);
+    }
   }
 }
