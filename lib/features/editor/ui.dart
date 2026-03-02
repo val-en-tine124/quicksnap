@@ -21,7 +21,19 @@ class EditorScaffold extends ConsumerWidget {
       body: editorIsLoading
           ? const Center(child: CircularProgressIndicator())
           : const _Editor(),
-      drawer: Drawer(child: Center(child: const DrawerFsOps())),
+      drawer: Drawer(
+        child: Center(
+          child: Column(
+            children: [
+              Expanded(
+                child: const DrawerFsOps(),
+              ), // Let DrawerFsOps take up the remaining space in the column
+              //after AboutSection has use up it required space.
+              AboutSection(),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -86,8 +98,32 @@ class _EditorToolBar extends StatelessWidget {
   }
 }
 
+class AboutSection extends StatelessWidget {
+  const AboutSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: const Icon(Icons.info),
+      title: const Text("About"),
+      trailing: const Icon(Icons.arrow_forward_ios),
+    );
+  }
+}
+
 class DrawerFsOps extends ConsumerWidget {
   const DrawerFsOps({super.key});
+
+  Widget _showSpinner(String spinnerText) {
+    return Center(
+      child: Column(
+        children: [
+          CircularProgressIndicator(),
+          Padding(padding: EdgeInsetsGeometry.all(4), child: Text(spinnerText)),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -96,31 +132,41 @@ class DrawerFsOps extends ConsumerWidget {
       ListTile(
         onTap: () {
           fileData.newFile();
+          if (!context.mounted) return;
+          Navigator.pop(context);
           ref
               .read(filePickerProvider)
               .when(
                 data: (data) {},
                 error: (e, s) =>
                     customScaffoldMessenger(context, Text("Error: $e")),
-                loading: () => Center(
-                  child: Column(
-                    children: [
-                      CircularProgressIndicator(),
-                      Padding(
-                        padding: EdgeInsetsGeometry.all(4),
-                        child: Text("Creating an empty file ..."),
-                      ),
-                    ],
-                  ),
-                ),
+                loading: () => _showSpinner("Creating an empty file ...")
               );
+
         }, //TODO
         leading: const Icon(Icons.add),
         title: const Text("New File"),
         trailing: const Icon(Icons.arrow_forward_ios),
       ),
       ListTile(
-        onTap: () {},
+        onTap: () {
+          fileData.saveFile();
+          if (!context.mounted) return;
+          Navigator.pop(context);
+          ref
+              .read(filePickerProvider)
+              .when(
+                data: (data) => customScaffoldMessenger(
+                  context,
+                  Text("File saved successfully"),
+                ),
+                error: (e, s) =>
+                    customScaffoldMessenger(context, Text("Error: $e")),
+                loading: () => _showSpinner("Saving file ..."),
+              );
+
+          
+        },
         leading: const Icon(Icons.save),
         title: const Text("Save File"),
         trailing: const Icon(Icons.arrow_forward_ios),
@@ -133,10 +179,12 @@ class DrawerFsOps extends ConsumerWidget {
           ref
               .read(filePickerProvider)
               .when(
-                data: (data) => customScaffoldMessenger(
-                  context,
-                  Text("Opened file successfully: ${data?.name}"),
-                ),
+                data: (data) => data != null
+                    ? customScaffoldMessenger(
+                        context,
+                        Text("Opened file successfully: ${data.name}"),
+                      )
+                    : null,
                 error: (e, s) =>
                     customScaffoldMessenger(context, Text("Error: $e")),
                 loading: () {},
