@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:quicksnap/features/editor/about.dart';
 import 'package:quicksnap/features/editor/providers.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -107,6 +108,14 @@ class AboutSection extends StatelessWidget {
       leading: const Icon(Icons.info),
       title: const Text("About"),
       trailing: const Icon(Icons.arrow_forward_ios),
+      onTap: () {
+        if (context.mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => AboutPage()),
+          );
+        }
+      },
     );
   }
 }
@@ -140,9 +149,8 @@ class DrawerFsOps extends ConsumerWidget {
                 data: (data) {},
                 error: (e, s) =>
                     customScaffoldMessenger(context, Text("Error: $e")),
-                loading: () => _showSpinner("Creating an empty file ...")
+                loading: () => _showSpinner("Creating an empty file ..."),
               );
-
         }, //TODO
         leading: const Icon(Icons.add),
         title: const Text("New File"),
@@ -164,8 +172,6 @@ class DrawerFsOps extends ConsumerWidget {
                     customScaffoldMessenger(context, Text("Error: $e")),
                 loading: () => _showSpinner("Saving file ..."),
               );
-
-          
         },
         leading: const Icon(Icons.save),
         title: const Text("Save File"),
