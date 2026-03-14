@@ -16,8 +16,9 @@ class EditorScaffold extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: RepaintBoundary(
-          child: Text(fileData, style: TextStyle(fontSize: 16)),
+          child: Center(child: Text(fileData, style: TextStyle(fontSize: 16))),
         ),
+        actions: [IconButton(onPressed: (){}, icon: Icon(Icons.settings))],
       ),
       body: editorIsLoading
           ? const Center(child: CircularProgressIndicator())
