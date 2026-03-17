@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_ce/hive.dart';
+import 'package:quicksnap/features/settings/hive_registrar.g.dart';
 import 'features/editor/ui.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -28,7 +30,11 @@ import 'package:flutter_quill/flutter_quill.dart';
 // }
 
 void main() {
+  Hive.openBox("QuickSnapSettings");
+  Hive.registerAdapters();
+
   runApp(const ProviderScope(child: QuickSnapApp()));
+  Hive.close();
 }
 
 class QuickSnapApp extends StatelessWidget {

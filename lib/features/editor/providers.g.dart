@@ -8,15 +8,18 @@ part of 'providers.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// This is a provider for the text eiditor loading state
+/// This is a provider for the text editor loading state.
+/// It return a boolean.
 
 @ProviderFor(EditorIsLoading)
 final editorIsLoadingProvider = EditorIsLoadingProvider._();
 
-/// This is a provider for the text editor loading state
+/// This is a provider for the text editor loading state.
+/// It return a boolean.
 final class EditorIsLoadingProvider
     extends $NotifierProvider<EditorIsLoading, bool> {
-  /// This is a provider for the text eiditor loading state
+  /// This is a provider for the text editor loading state.
+  /// It return a boolean.
   EditorIsLoadingProvider._()
     : super(
         from: null,
@@ -44,9 +47,10 @@ final class EditorIsLoadingProvider
   }
 }
 
-String _$editorIsLoadingHash() => r'6110eaac41e19e2764cfde626309c4a552373756';
+String _$editorIsLoadingHash() => r'12c411cd75d265dad87de45683e368965f9fef3d';
 
-/// This is a provider for the text eiditor loading state
+/// This is a provider for the text editor loading state.
+/// It return a boolean.
 
 abstract class _$EditorIsLoading extends $Notifier<bool> {
   bool build();
@@ -97,7 +101,7 @@ final class AppBarTitleProvider extends $NotifierProvider<AppBarTitle, String> {
   }
 }
 
-String _$appBarTitleHash() => r'066492e1f1409edb45a742045e43bd887535bf2b';
+String _$appBarTitleHash() => r'526879d1abf9923297023caf808cbd665b7e1183';
 
 abstract class _$AppBarTitle extends $Notifier<String> {
   String build();
@@ -146,7 +150,7 @@ final class FilePickerNotifierProvider
 }
 
 String _$filePickerNotifierHash() =>
-    r'd142584848a95a9b2824621320d797645f9587f4';
+    r'5f8738b693112dad608197cafeafbd557f80bedd';
 
 ///This notifier contains methods for various file operation.
 
