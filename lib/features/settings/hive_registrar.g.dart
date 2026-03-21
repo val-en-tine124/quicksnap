@@ -3,16 +3,18 @@
 // Check in to version control
 
 import 'package:hive_ce/hive_ce.dart';
-import 'package:quicksnap/features/settings/db.dart';
+import 'package:quicksnap/features/settings/providers.dart';
 
 extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
     registerAdapter(QuickSnapSettingsAdapter());
+    registerAdapter(ThemeModeAdapter());
   }
 }
 
 extension IsolatedHiveRegistrar on IsolatedHiveInterface {
   void registerAdapters() {
     registerAdapter(QuickSnapSettingsAdapter());
+    registerAdapter(ThemeModeAdapter());
   }
 }
