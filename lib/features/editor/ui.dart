@@ -4,6 +4,10 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:quicksnap/features/editor/about.dart';
 import 'package:quicksnap/features/editor/providers.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:quicksnap/features/settings/models.dart';
+import 'package:quicksnap/features/settings/providers.dart';
+import 'package:quicksnap/features/settings/ui.dart';
+import '../widgets.dart';
 
 class EditorScaffold extends ConsumerWidget {
   const EditorScaffold({super.key});
@@ -11,18 +15,27 @@ class EditorScaffold extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final fileData = ref.watch(appBarTitleProvider);
-    final editorIsLoading = ref.watch(editorIsLoadingProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: RepaintBoundary(
           child: Center(child: Text(fileData, style: TextStyle(fontSize: 16))),
         ),
-        actions: [IconButton(onPressed: (){}, icon: Icon(Icons.settings))],
+        actions: [
+          IconButton(
+            onPressed: () {
+              if (context.mounted) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => SettingsUI()),
+                );
+              }
+            },
+            icon: Icon(Icons.settings),
+          ),
+        ],
       ),
-      body: editorIsLoading
-          ? const Center(child: CircularProgressIndicator())
-          : const _Editor(),
+      body: const _Editor(),
       drawer: Drawer(
         child: Center(
           child: Column(
@@ -41,40 +54,24 @@ class EditorScaffold extends ConsumerWidget {
 }
 
 ///This is My app Editor
-class _Editor extends ConsumerStatefulWidget {
+class _Editor extends ConsumerWidget {
   const _Editor();
   @override
-  ConsumerState<_Editor> createState() {
-    return _EditorState();
-  }
-}
-
-class _EditorState extends ConsumerState<_Editor> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.watch(quillControllerProvider);
+    final quickSnapSettings = ref.watch(settingsStateProvider).value ?? QuickSnapSettings.getDefault();
     return Column(
       children: [
         Expanded(
           child: QuillEditor.basic(
             controller: controller,
-            config: QuillEditorConfig(autoFocus: true),
+            config: quickSnapSettings.quillEditorConfig(),
           ),
         ),
 
         _EditorToolBar(controller),
       ],
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 }
 
@@ -152,7 +149,7 @@ class DrawerFsOps extends ConsumerWidget {
                     customScaffoldMessenger(context, Text("Error: $e")),
                 loading: () => _showSpinner("Creating an empty file ..."),
               );
-        }, //TODO
+        },
         leading: const Icon(Icons.add),
         title: const Text("New File"),
         trailing: const Icon(Icons.arrow_forward_ios),
@@ -217,11 +214,4 @@ class DrawerFsOps extends ConsumerWidget {
       ],
     );
   }
-}
-
-ScaffoldFeatureController<SnackBar, SnackBarClosedReason>
-customScaffoldMessenger(BuildContext context, Text content) {
-  return ScaffoldMessenger.of(
-    context,
-  ).showSnackBar(SnackBar(content: content, duration: 7.seconds));
 }
