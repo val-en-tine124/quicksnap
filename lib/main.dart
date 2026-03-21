@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive_ce/hive.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:quicksnap/features/settings/hive_registrar.g.dart';
+import 'package:quicksnap/features/settings/models.dart';
 import 'features/editor/ui.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import './features/settings/providers.dart';
 // import 'db.dart';
 // import 'home_screen.dart';
 
@@ -29,23 +31,32 @@ import 'package:flutter_quill/flutter_quill.dart';
 //   }
 // }
 
-void main() {
-  Hive.openBox("QuickSnapSettings");
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
   Hive.registerAdapters();
+  final box = await Hive.openBox<QuickSnapSettings>('QuickSnapSettings');
 
-  runApp(const ProviderScope(child: QuickSnapApp()));
-  Hive.close();
+  runApp(
+    ProviderScope(
+      overrides: [settingsInHiveProvider.overrideWithValue(box)],
+      child: const QuickSnapApp(),
+    ),
+  );
 }
 
-class QuickSnapApp extends StatelessWidget {
+class QuickSnapApp extends ConsumerWidget {
   const QuickSnapApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context,WidgetRef ref){
+    final themeMode = ref.watch(currentThemeProvider);
+    
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.indigo),
       darkTheme: ThemeData.dark(useMaterial3: true),
+      themeMode:themeMode,
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
