@@ -1,33 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+part 'models.freezed.dart';
 
-/// This is aQuickSnapSettingss Class that wraps the QuillEditorConfig
+/// This is a QuickSnapSettings Class that wraps the QuillEditorConfig
 /// and add some other important settings i can use.
 ///   It also has a quillEditorConfig static method to create
 /// a QuillEditorConfig instance.
-class QuickSnapSettings {
-  ThemeMode theme = ThemeMode.system;
-  bool autoFocus = true;
-  bool expands = true;
-  bool disableClipboard = false;
-  bool scrollable = true;
-  EdgeInsets padding = .zero;
- QuickSnapSettings({
-    required this.theme,
-    required this.autoFocus,
-    required this.expands,
-    required this.disableClipboard,
-    required this.scrollable,
-    required this.padding,
-  });
+@freezed
+abstract class QuickSnapSettings with _$QuickSnapSettings {
+  const QuickSnapSettings._();
+  const factory QuickSnapSettings({
+    @Default(ThemeMode.system) ThemeMode theme,
+    @Default(true) bool autoFocus,
+    @Default(true) bool expands,
+    @Default(false) bool disableClipboard,
+    @Default(true) bool scrollable,
+    @Default(0.0) double padding,
+  }) = _QuickSnapSettings;
 
+  static  QuickSnapSettings getDefault(){
+    return QuickSnapSettings(
+        theme: ThemeMode.system,
+        autoFocus: true,
+        expands: true,
+        disableClipboard: false,
+        scrollable: true,
+        padding: 0,
+      );
+  }
+
+}
+extension EditorConfigFromSetting on QuickSnapSettings{
   QuillEditorConfig quillEditorConfig() {
     return QuillEditorConfig(
-      autoFocus:autoFocus,
+      autoFocus: autoFocus,
       expands: expands,
       disableClipboard: disableClipboard,
       scrollable: scrollable,
-      padding:padding,
+      padding: EdgeInsets.all(padding),
     );
-  }
-}
+}}
