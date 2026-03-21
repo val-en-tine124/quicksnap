@@ -8,67 +8,6 @@ part of 'providers.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// This is a provider for the text editor loading state.
-/// It return a boolean.
-
-@ProviderFor(EditorIsLoading)
-final editorIsLoadingProvider = EditorIsLoadingProvider._();
-
-/// This is a provider for the text editor loading state.
-/// It return a boolean.
-final class EditorIsLoadingProvider
-    extends $NotifierProvider<EditorIsLoading, bool> {
-  /// This is a provider for the text editor loading state.
-  /// It return a boolean.
-  EditorIsLoadingProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'editorIsLoadingProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$editorIsLoadingHash();
-
-  @$internal
-  @override
-  EditorIsLoading create() => EditorIsLoading();
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(bool value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<bool>(value),
-    );
-  }
-}
-
-String _$editorIsLoadingHash() => r'12c411cd75d265dad87de45683e368965f9fef3d';
-
-/// This is a provider for the text editor loading state.
-/// It return a boolean.
-
-abstract class _$EditorIsLoading extends $Notifier<bool> {
-  bool build();
-  @$mustCallSuper
-  @override
-  void runBuild() {
-    final ref = this.ref as $Ref<bool, bool>;
-    final element =
-        ref.element
-            as $ClassProviderElement<
-              AnyNotifier<bool, bool>,
-              bool,
-              Object?,
-              Object?
-            >;
-    element.handleCreate(ref, build);
-  }
-}
 
 @ProviderFor(AppBarTitle)
 final appBarTitleProvider = AppBarTitleProvider._();
@@ -150,7 +89,7 @@ final class FilePickerNotifierProvider
 }
 
 String _$filePickerNotifierHash() =>
-    r'5f8738b693112dad608197cafeafbd557f80bedd';
+    r'd71a7cee70509cf41cc76c4fadb84ccfc7424b0d';
 
 ///This notifier contains methods for various file operation.
 
