@@ -51,7 +51,8 @@ dependencies:
   flutter_animate: ^4.5.2
   hive_ce: ^2.19.3
   hive_ce_flutter: ^2.3.4
-  flutter_settings_ui: ^3.0.1
+  gizmos_settings_screen: ^0.5.0
+  freezed_annotation: ^3.1.0
 
 dev_dependencies:
   flutter_test:
@@ -68,6 +69,7 @@ dev_dependencies:
   test: ^1.26.3
   mockito: ^5.4.4
   hive_ce_generator: ^1.11.0
+  freezed: ^3.2.5
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
