@@ -39,5 +39,6 @@ extension EditorConfigFromSetting on QuickSnapSettings{
       disableClipboard: disableClipboard,
       scrollable: scrollable,
       padding: EdgeInsets.all(padding),
+      placeholder:"Type your text here."
     );
 }}
