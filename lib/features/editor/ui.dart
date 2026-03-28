@@ -7,7 +7,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:quicksnap/features/settings/models.dart';
 import 'package:quicksnap/features/settings/providers.dart';
 import 'package:quicksnap/features/settings/ui.dart';
-import '../widgets.dart';
+import '../../widgets.dart';
 
 class EditorScaffold extends ConsumerWidget {
   const EditorScaffold({super.key});
@@ -23,6 +23,7 @@ class EditorScaffold extends ConsumerWidget {
         ),
         actions: [
           IconButton(
+            tooltip: "Settings",
             onPressed: () {
               if (context.mounted) {
                 Navigator.push(
@@ -59,7 +60,10 @@ class _Editor extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.watch(quillControllerProvider);
-    final quickSnapSettings = ref.watch(settingsStateProvider).value ?? QuickSnapSettings.getDefault();
+    final quickSnapSettings =
+        ref.watch(settingsStateProvider).value ??
+        QuickSnapSettings.getDefault();
+
     return Column(
       children: [
         Expanded(
