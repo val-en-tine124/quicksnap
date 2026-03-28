@@ -1,7 +1,5 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gizmos_settings_screen/gizmos_settings_screen.dart';
 import 'package:quicksnap/features/settings/providers.dart';
 
 class SettingsUI extends StatelessWidget {
@@ -11,60 +9,132 @@ class SettingsUI extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("QuickSnap Settings", style: TextStyle(fontWeight: .bold)),
+        title: const Text("QuickSnap Settings", style: TextStyle(fontWeight: FontWeight.bold)),
       ),
-      body: _SettingsBody(),
+      body: const _SettingsBody(),
     );
   }
 }
 
-class _SettingsBody extends ConsumerWidget {
-  _SettingsBody();
-  // Select the default skin to use
-  final SettingsSkinDelegate skinDelegate = !Platform.isIOS
-      ? MaterialSettingsSkin()
-      : CupertinoSettingsSkin();
+class _SettingsBody extends StatelessWidget {
+  const _SettingsBody();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final bool autoFocus = ref.watch(currentAutoFocusProvider);
-    return SettingsSkin(
-      delegate: skinDelegate,
-      child: SettingsScreen(
-        sections: [
-          SettingsSection(
-            header: "Appearance",
-            cells: [
-              DetailsSettingsCell(
-                title: "App Theme",
-                subtitle: "Choose the theme of the app",
-                value: "",
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return _ThemeSettingsDialog();
-                    },
-                  );
-                },
-              ),
-            ],
-          ),
-          SettingsSection(
-            header: "Editor",
-            cells: [
-              SwitchSettingsCell(
-                title: "Auto Focus",
-                subtitle: "Toggle the text editor cursor focus",
-                value: autoFocus,
-                onChanged: (value) => ref
-                    .read(settingsStateProvider.notifier)
-                    .changeAutoFocus(value),
-              ),
-            ],
-          ),
-        ],
+  Widget build(BuildContext context) {
+    return ListView(
+      children: [
+        const _SectionHeader("Appearance"),
+        ListTile(
+          title: const Text("App Theme"),
+          subtitle: const Text("Choose the theme of the app"),
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (context) => const _ThemeSettingsDialog(),
+            );
+          },
+        ),
+        const _SectionHeader("Editor"),
+        Consumer(
+          builder: (context, ref, _) {
+            final autoFocus = ref.watch(currentAutoFocusProvider);
+            return SwitchListTile(
+              title: const Text("Auto Focus"),
+              subtitle: const Text("Toggle the text editor cursor focus"),
+              value: autoFocus,
+              onChanged: (value) =>
+                  ref.read(settingsStateProvider.notifier).changeAutoFocus(value),
+            );
+          },
+        ),
+        Consumer(
+          builder: (context, ref, _) {
+            final editorExpand = ref.watch(currentEditorExpandProvider);
+            return SwitchListTile(
+              title: const Text("Editor Expand"),
+              subtitle: const Text("Toggle the text editor expansion"),
+              value: editorExpand,
+              onChanged: (value) =>
+                  ref.read(settingsStateProvider.notifier).changeEditorExpand(value),
+            );
+          },
+        ),
+        Consumer(
+          builder: (context, ref, _) {
+            final disableClipboard = ref.watch(currentDisableClipboardProvider);
+            return SwitchListTile(
+              title: const Text("Disable Clipboard"),
+              subtitle: const Text("Toggle to enable or disable clipboard"),
+              value: disableClipboard,
+              onChanged: (value) => ref
+                  .read(settingsStateProvider.notifier)
+                  .changeDisableClipboard(value),
+            );
+          },
+        ),
+        Consumer(
+          builder: (context, ref, _) {
+            final editorScrollable = ref.watch(currentEditorScrollableProvider);
+            return SwitchListTile(
+              title: const Text("Scrollable Editor"),
+              subtitle: const Text("Toggle to make editor scrollable"),
+              value: editorScrollable,
+              onChanged: (value) => ref
+                  .read(settingsStateProvider.notifier)
+                  .changeEditorScrollable(value),
+            );
+          },
+        ),
+        ListTile(
+          title: const Text("Editor padding"),
+          subtitle: const Text("Choose editor padding/spacing"),
+          onTap: () {
+            showDialog(
+                context: context,
+                builder: (context) => const _PaddingSettingDialog(),
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader(this.title);
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
       ),
+    );
+  }
+}
+
+
+class _PaddingSettingDialog extends ConsumerWidget {
+  const _PaddingSettingDialog();
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final editorPadding = ref.watch(currentEditorPaddingProvider);
+    return AlertDialog.adaptive(
+      title: const Text("Select padding size"),
+      content: Slider(
+        value: editorPadding,
+        onChanged: (value) => ref.read(settingsStateProvider.notifier).changeEditorPadding(value),
+        min: 0,
+        max: 50,
+        divisions: 5,
+        label: editorPadding.round().toString(),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text("Done"))
+      ],
     );
   }
 }
@@ -74,7 +144,7 @@ class _ThemeSettingsDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ThemeMode themeState = ref.watch(currentThemeProvider);
+    final themeState = ref.watch(currentThemeProvider);
 
     return AlertDialog(
       title: Text("Choose Theme"),
