@@ -43,6 +43,7 @@ class SettingsState extends _$SettingsState {
     ); // Update Theme Settings state.
     _saveSettings(state); // Then save the settings.
   }
+
   /// Update auto focus Settings state.
   void changeAutoFocus(bool autoFocus) async {
     final settings = await future;
@@ -70,15 +71,6 @@ class SettingsState extends _$SettingsState {
     _saveSettings(state); // Then save the settings.
   }
 
-  /// Update editor scrollable  Settings state.
-  void changeEditorScrollable(bool scrollable) async {
-    final settings = await future;
-    state = AsyncData(
-      settings.copyWith(scrollable: scrollable),
-    ); // Update editor scrollable  Settings state.
-    _saveSettings(state); // Then save the settings.
-  }
-
   // Update editor padding  Settings state.
   void changeEditorPadding(double padding) async {
     final settings = await future;
@@ -87,7 +79,6 @@ class SettingsState extends _$SettingsState {
     ); // Update editor padding  Settings state.
     _saveSettings(state); // Then save the settings.
   }
-  
 }
 
 @riverpod
@@ -97,31 +88,33 @@ ThemeMode currentTheme(Ref ref) {
 }
 
 @riverpod
-bool currentAutoFocus(Ref ref){
-  final autoFocus = ref.watch(settingsStateProvider.select((s) => s.value?.autoFocus));
+bool currentAutoFocus(Ref ref) {
+  final autoFocus = ref.watch(
+    settingsStateProvider.select((s) => s.value?.autoFocus),
+  );
   return autoFocus ?? true;
 }
 
 @riverpod
-bool currentEditorExpand(Ref ref){
-  final editorExpands = ref.watch(settingsStateProvider.select((s) => s.value?.expands));
+bool currentEditorExpand(Ref ref) {
+  final editorExpands = ref.watch(
+    settingsStateProvider.select((s) => s.value?.expands),
+  );
   return editorExpands ?? true;
 }
 
 @riverpod
-bool currentDisableClipboard(Ref ref){
-  final disableClipboard = ref.watch(settingsStateProvider.select((s) => s.value?.disableClipboard));
+bool currentDisableClipboard(Ref ref) {
+  final disableClipboard = ref.watch(
+    settingsStateProvider.select((s) => s.value?.disableClipboard),
+  );
   return disableClipboard ?? false;
 }
 
 @riverpod
-bool currentEditorScrollable(Ref ref){
-  final editorScrollable = ref.watch(settingsStateProvider.select((s) => s.value?.scrollable));
-  return editorScrollable ?? true;
-}
-
-@riverpod
-double currentEditorPadding(Ref ref){
-  final editorPadding = ref.watch(settingsStateProvider.select((s) => s.value?.padding));
+double currentEditorPadding(Ref ref) {
+  final editorPadding = ref.watch(
+    settingsStateProvider.select((s) => s.value?.padding),
+  );
   return editorPadding ?? 0.0;
 }

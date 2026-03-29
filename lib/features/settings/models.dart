@@ -15,7 +15,6 @@ abstract class QuickSnapSettings with _$QuickSnapSettings {
     @Default(true) bool autoFocus,
     @Default(true) bool expands,
     @Default(false) bool disableClipboard,
-    @Default(true) bool scrollable,
     @Default(0.0) double padding,
   }) = _QuickSnapSettings;
 
@@ -25,7 +24,6 @@ abstract class QuickSnapSettings with _$QuickSnapSettings {
         autoFocus: true,
         expands: true,
         disableClipboard: false,
-        scrollable: true,
         padding: 0,
       );
   }
@@ -37,7 +35,6 @@ extension EditorConfigFromSetting on QuickSnapSettings{
       autoFocus: autoFocus,
       expands: expands,
       disableClipboard: disableClipboard,
-      scrollable: scrollable,
       padding: EdgeInsets.all(padding),
       placeholder:"Type your text here."
     );

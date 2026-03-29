@@ -72,19 +72,7 @@ class _SettingsBody extends StatelessWidget {
             );
           },
         ),
-        Consumer(
-          builder: (context, ref, _) {
-            final editorScrollable = ref.watch(currentEditorScrollableProvider);
-            return SwitchListTile(
-              title: const Text("Scrollable Editor"),
-              subtitle: const Text("Toggle to make editor scrollable"),
-              value: editorScrollable,
-              onChanged: (value) => ref
-                  .read(settingsStateProvider.notifier)
-                  .changeEditorScrollable(value),
-            );
-          },
-        ),
+        
         ListTile(
           title: const Text("Editor padding"),
           subtitle: const Text("Choose editor padding/spacing"),
@@ -129,7 +117,7 @@ class _PaddingSettingDialog extends ConsumerWidget {
         onChanged: (value) => ref.read(settingsStateProvider.notifier).changeEditorPadding(value),
         min: 0,
         max: 50,
-        divisions: 5,
+        divisions: 10,
         label: editorPadding.round().toString(),
       ),
       actions: [
