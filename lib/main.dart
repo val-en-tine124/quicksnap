@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
+import 'package:quicksnap/styling/theme_data.dart';
 import 'package:quicksnap/features/settings/hive_registrar.g.dart';
 import 'package:quicksnap/features/settings/models.dart';
 import 'features/editor/ui.dart';
@@ -54,8 +55,8 @@ class QuickSnapApp extends ConsumerWidget {
     
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.indigo),
-      darkTheme: ThemeData.dark(useMaterial3: true),
+      theme: AppThemeData.light() ,
+      darkTheme: AppThemeData.dark(),
       themeMode:themeMode,
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
