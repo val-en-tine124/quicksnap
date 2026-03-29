@@ -208,7 +208,7 @@ class DrawerFsOps extends ConsumerWidget {
         DrawerHeader(
           decoration: BoxDecoration(color: Theme.of(context).primaryColor),
           child: Center(
-            child: Text(
+            child: const Text(
               'QuickSnap',
               style: TextStyle(fontSize: 24),
             ).animate().fadeIn(duration: 4.seconds).then().effect().shake(),
