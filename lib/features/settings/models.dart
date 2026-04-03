@@ -16,6 +16,7 @@ abstract class QuickSnapSettings with _$QuickSnapSettings {
     @Default(true) bool expands,
     @Default(false) bool disableClipboard,
     @Default(0.0) double padding,
+    @Default(UserColorEnum.amber) UserColorEnum userColor,
   }) = _QuickSnapSettings;
 
   static  QuickSnapSettings getDefault(){
@@ -34,8 +35,25 @@ extension EditorConfigFromSetting on QuickSnapSettings{
     return QuillEditorConfig(
       autoFocus: autoFocus,
       expands: expands,
-      disableClipboard: disableClipboard,
+
+     disableClipboard: disableClipboard,
       padding: EdgeInsets.all(padding),
-      placeholder:"Type your text here."
+      placeholder:"Type your text here." 
     );
 }}
+
+
+enum UserColorEnum { amber, blue, pink }
+extension ToMaterialColor on UserColorEnum{
+  MaterialColor toMaterialColor(){
+    switch (name) {
+      case "amber":
+        return Colors.amber;
+      case "blue":
+        return Colors.blue;
+      case "pink":
+        return Colors.pink;
+    }
+    throw Exception("Invalid Enum value.");
+  }
+}

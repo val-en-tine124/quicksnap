@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:quicksnap/features/settings/models.dart';
 import 'package:quicksnap/features/settings/providers.dart';
+import 'package:quicksnap/features/widgets.dart';
 
 class SettingsUI extends StatelessWidget {
   const SettingsUI({super.key});
@@ -83,6 +85,16 @@ class _SettingsBody extends StatelessWidget {
             );
           },
         ),
+        const _SectionHeader("Styling"),
+        Consumer(
+          builder: (context, ref, _) {
+            final colorValue  = ref.watch(currentUserColorProvider);
+            return ColorButtonTray(
+              colors: UserColorEnum.values,
+              value: colorValue,
+              onTap: (color)=>ref.read(settingsStateProvider.notifier).changeColor(color),
+            );
+          }),
       ],
     );
   }
@@ -98,7 +110,7 @@ class _SectionHeader extends StatelessWidget {
       padding: const EdgeInsets.all(16.0),
       child: Text(
         title,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
       ),
     );
   }

@@ -5,7 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import './models.dart';
 
 @GenerateAdapters(
-  [AdapterSpec<QuickSnapSettings>(), AdapterSpec<ThemeMode>()],
+  [AdapterSpec<QuickSnapSettings>(), AdapterSpec<ThemeMode>(),AdapterSpec<UserColorEnum>()],
 ) // DO this to make QuickSnapSettings Hive compatible(i.e serialiazable and deserializable), and generate the adapter using build_runner
 part 'providers.g.dart';
 
@@ -36,6 +36,13 @@ class SettingsState extends _$SettingsState {
     state = AsyncData(stateValue);
   }
 
+  void changeColor(UserColorEnum color) async {
+    final settings = await future;
+    state = AsyncValue.data(settings.copyWith(userColor: color));
+    _saveSettings(state);
+  }
+
+  //Update ThemeMode(light,dark or system).
   void changeTheme(ThemeMode theme) async {
     final settings = await future;
     state = AsyncData(
@@ -79,6 +86,14 @@ class SettingsState extends _$SettingsState {
     ); // Update editor padding  Settings state.
     _saveSettings(state); // Then save the settings.
   }
+}
+
+@riverpod
+UserColorEnum currentUserColor(Ref ref) {
+  final userColor = ref.watch(
+    settingsStateProvider.select((s) => s.value?.userColor),
+  );
+  return userColor ?? UserColorEnum.amber;
 }
 
 @riverpod
