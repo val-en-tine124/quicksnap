@@ -7,7 +7,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:quicksnap/features/settings/models.dart';
 import 'package:quicksnap/features/settings/providers.dart';
 import 'package:quicksnap/features/settings/ui.dart';
-import '../../widgets.dart';
+import '../widgets.dart';
 
 class EditorScaffold extends ConsumerWidget {
   const EditorScaffold({super.key});

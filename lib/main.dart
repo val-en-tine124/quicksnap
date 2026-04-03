@@ -55,8 +55,8 @@ class QuickSnapApp extends ConsumerWidget {
     
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: AppThemeData.light() ,
-      darkTheme: AppThemeData.dark(),
+      theme: AppThemeData.light(context,ref) ,
+      darkTheme: AppThemeData.dark(context,ref),
       themeMode:themeMode,
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,

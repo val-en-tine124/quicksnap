@@ -1,63 +1,53 @@
 import 'package:flutter/material.dart';
+import 'package:quicksnap/features/settings/models.dart';
+import 'package:quicksnap/features/settings/providers.dart';
 import 'package:quicksnap/styling/theme_extension.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AppThemeData {
   const AppThemeData._();
 
-  static ThemeData light() {
-    const ext = AppColorsExtension.light;
+  static ThemeData light(BuildContext context, WidgetRef ref) {
+    final seedColor = ref.watch(currentUserColorProvider).toMaterialColor();
     return ThemeData(
       useMaterial3: true,
-      colorScheme: ColorScheme.light(
-        primary: ext.brandPrimary,
-        secondary: ext.brandSecondary,
-        surface: ext.surface,
-        onSurface: ext.onSurface,
-        error: ext.danger,
-      ),
+      colorScheme: ColorScheme.fromSeed(seedColor: seedColor),
       textTheme: _buildTextTheme(),
       cardTheme: CardThemeData(
         elevation: 0,
-        color: ext.surface,
-        surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: ext.onSurface.withValues(alpha: 0.08)),
+          side: BorderSide(),
         ),
       ),
-      listTileTheme: _buildListTileTheme(ext),
-      extensions: [AppColorsExtension.light],
+      listTileTheme: _buildListTileTheme(),
     );
   }
 
-  static ThemeData dark() {
-    const ext = AppColorsExtension.dark;
+  static ThemeData dark(BuildContext context, WidgetRef ref) {
+    final seedColor = ref.watch(currentUserColorProvider).toMaterialColor();
     return ThemeData(
       useMaterial3: true,
-      colorScheme: ColorScheme.dark(
-        primary: ext.brandPrimary,
-        secondary: ext.brandSecondary,
-        surface: ext.surface,
-        onSurface: ext.onSurface,
-        error: ext.danger,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: seedColor,
+        brightness: .dark,
       ),
       textTheme: _buildTextTheme(),
-      listTileTheme: _buildListTileTheme(ext),
+      listTileTheme: _buildListTileTheme(),
     );
   }
 
-  static ListTileThemeData _buildListTileTheme(AppColorsExtension ext) {
+  static ListTileThemeData _buildListTileTheme() {
     return ListTileThemeData(
       shape: RoundedRectangleBorder(
-        side: BorderSide(color: ext.onSurface.withValues(alpha: 0.08)),
+        side: BorderSide(style: .none),
         borderRadius: BorderRadiusGeometry.circular(30),
       ),
       contentPadding: const .all(2.0),
       titleAlignment: .top,
       minLeadingWidth: 0.0,
-      
+
       minVerticalPadding: 17.0,
-      
     );
   }
 
