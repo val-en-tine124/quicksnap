@@ -61,23 +61,10 @@ class _SettingsBody extends StatelessWidget {
             );
           },
         ),
-        Consumer(
-          builder: (context, ref, _) {
-            final disableClipboard = ref.watch(currentDisableClipboardProvider);
-            return SwitchListTile(
-              title: const Text("Disable Clipboard"),
-              subtitle: const Text("Toggle to enable or disable clipboard"),
-              value: disableClipboard,
-              onChanged: (value) => ref
-                  .read(settingsStateProvider.notifier)
-                  .changeDisableClipboard(value),
-            );
-          },
-        ),
         
         ListTile(
           title: const Text("Editor padding"),
-          subtitle: const Text("Choose editor padding/spacing"),
+          subtitle: const Text("Choose padding/spacing between the editor and your text"),
           onTap: () {
             showDialog(
                 context: context,

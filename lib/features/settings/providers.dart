@@ -69,15 +69,6 @@ class SettingsState extends _$SettingsState {
     _saveSettings(state); // Then save the settings.
   }
 
-  /// Update disable clipboard Settings state.
-  void changeDisableClipboard(bool disableClipboard) async {
-    final settings = await future;
-    state = AsyncData(
-      settings.copyWith(disableClipboard: disableClipboard),
-    ); // Update disable clipboard Settings state.
-    _saveSettings(state); // Then save the settings.
-  }
-
   // Update editor padding  Settings state.
   void changeEditorPadding(double padding) async {
     final settings = await future;
@@ -116,14 +107,6 @@ bool currentEditorExpand(Ref ref) {
     settingsStateProvider.select((s) => s.value?.expands),
   );
   return editorExpands ?? true;
-}
-
-@riverpod
-bool currentDisableClipboard(Ref ref) {
-  final disableClipboard = ref.watch(
-    settingsStateProvider.select((s) => s.value?.disableClipboard),
-  );
-  return disableClipboard ?? false;
 }
 
 @riverpod
