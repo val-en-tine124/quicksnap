@@ -32,11 +32,12 @@ import './features/settings/providers.dart';
 //   }
 // }
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
+  await Hive.initFlutter("quicksnap_data");
   Hive.registerAdapters();
-  final box = await Hive.openBox<QuickSnapSettings>('QuickSnapSettings');
+  final box = await Hive.openBox<QuickSnapSettings>("QuickSnapSettings");
 
   runApp(
     ProviderScope(
@@ -50,14 +51,14 @@ class QuickSnapApp extends ConsumerWidget {
   const QuickSnapApp({super.key});
 
   @override
-  Widget build(BuildContext context,WidgetRef ref){
+  Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(currentThemeProvider);
-    
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: AppThemeData.light(context,ref) ,
-      darkTheme: AppThemeData.dark(context,ref),
-      themeMode:themeMode,
+      theme: AppThemeData.light(context, ref),
+      darkTheme: AppThemeData.dark(context, ref),
+      themeMode: themeMode,
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
