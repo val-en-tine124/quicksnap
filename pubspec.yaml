@@ -58,6 +58,7 @@ dependencies:
   hive_ce_flutter: ^2.3.4
   flutter_hooks: ^0.21.3+1
   package_info_plus: ^9.0.0
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -75,6 +76,14 @@ dev_dependencies:
   mockito: ^5.4.4
   hive_ce_generator: ^1.11.0
   freezed: ^3.2.5
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  adaptive_icon_background: "assets/logo/quicksnap_gradient.jpg"
+  adaptive_icon_foreground: "assets/logo/quicksnap.png"
+  image_path: "assets/logo/quicksnap.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
