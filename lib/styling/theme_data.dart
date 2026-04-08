@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quicksnap/features/settings/models.dart';
 import 'package:quicksnap/features/settings/providers.dart';
-import 'package:quicksnap/styling/theme_extension.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AppThemeData {
@@ -60,9 +59,19 @@ class AppThemeData {
       ),
       headlineMedium: TextStyle(fontSize: 28, fontWeight: FontWeight.w600),
       bodyMedium: TextStyle(
-        fontSize: 14,
+        fontSize: 14.0,
         fontWeight: FontWeight.w400,
         height: 1.5,
+      ),
+      titleMedium: TextStyle(
+        fontFamily: "ReThink-Sans",
+        fontSize: 14.0,
+        fontWeight: FontWeight.w400,
+      ),
+      titleLarge: TextStyle(
+        fontFamily: "CodePro",
+        fontSize: 24.0,
+        fontWeight: FontWeight.w400,
       ),
     );
   }
