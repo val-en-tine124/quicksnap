@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:quicksnap/features/settings/models.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-
 ///Creates an horizontal array of circular colored widget.
 
 class ColorButtonTray extends StatefulWidget {
@@ -12,11 +11,14 @@ class ColorButtonTray extends StatefulWidget {
     required this.colors,
     required this.onTap,
   });
+
   /// The  current value of the button.
   UserColorEnum value;
-  /// List of possibel color value.
+
+  /// List of possible color value.
   final List<UserColorEnum> colors;
-  /// Callback to that will run when te button is clicked.
+
+  /// Callback to that will run when the button is clicked.
   final void Function(UserColorEnum) onTap;
   @override
   State<ColorButtonTray> createState() => CircularColorButton();
@@ -55,7 +57,7 @@ class CircularColorButton extends State<ColorButtonTray> {
         });
         widget.onTap(color);
       },
-      
+
       child: Container(
         decoration: BoxDecoration(
           shape: BoxShape.circle,
@@ -67,7 +69,7 @@ class CircularColorButton extends State<ColorButtonTray> {
             strokeAlign: BorderSide.strokeAlignOutside,
           ),
         ),
-        margin: .symmetric(horizontal:10.0),
+        margin: .symmetric(horizontal: 10.0),
         padding: .all(2.0),
         child: CircleAvatar(backgroundColor: color.toMaterialColor()),
       ),
@@ -75,10 +77,100 @@ class CircularColorButton extends State<ColorButtonTray> {
   }
 }
 
-
 ScaffoldFeatureController<SnackBar, SnackBarClosedReason>
 customScaffoldMessenger(BuildContext context, Text content) {
   return ScaffoldMessenger.of(
     context,
   ).showSnackBar(SnackBar(content: content, duration: 7.seconds));
+}
+
+class CustomImageButton extends StatelessWidget {
+  const CustomImageButton({
+    super.key,
+    required this.onTap,
+    required this.imagePath,
+  });
+  final VoidCallback onTap;
+
+  final String imagePath;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      child: InkWell(
+        onTap: onTap,
+        radius: 50.0,
+        splashColor: Theme.of(context).focusColor.withValues(alpha: 0.32),
+        child: Image.asset(imagePath, width: 200.0, height: 100.0),
+      ),
+    );
+  }
+}
+
+class ImageCardButton extends StatelessWidget {
+  const ImageCardButton({
+    super.key,
+    required this.textSize,
+    required this.textBgColor,
+    required this.textFgColor,
+    required this.color,
+    required this.iconPath,
+    required this.imageText,
+    required this.onTap,
+  });
+  final Color color;
+  final VoidCallback onTap;
+  final double textSize;
+  final Color textBgColor;
+  final Color textFgColor;
+  final String iconPath;
+  final String imageText;
+  @override
+  Widget build(BuildContext context) {
+    // return InkWell(
+    //   child: Card(
+    //     margin: .symmetric(horizontal: 10.0, vertical: 10.0),
+    //     color: color,
+    //     shape: RoundedRectangleBorder(
+    //       side: BorderSide(),
+    //       borderRadius: .circular(5.0),
+    //     ),
+    //     child: Row(
+    //       children: [
+    //         Image.asset(iconPath, cacheHeight: 50, cacheWidth: 50),
+    //         Padding(
+    //           padding: const EdgeInsets.all(8.0),
+    //           child: Text(
+    //             imageText,
+    //             style: TextStyle(
+    //               backgroundColor: textBgColor,
+    //               color: textFgColor,
+    //               fontFamily: "CodePro",
+    //               fontStyle: .italic,
+    //               fontSize: textSize,
+    //             ),
+    //           ),
+    //         ),
+    //       ],
+    //     ),
+    //   ),
+    // );
+    return ElevatedButton.icon(
+      onPressed: onTap,
+      icon: Image.asset(iconPath, width: 50.0, height: 50.0),
+      iconAlignment: .start,
+      label: Text(
+        imageText,
+        style: TextStyle(
+          backgroundColor: textBgColor,
+          color: textFgColor,
+          fontFamily: "CodePro",
+          fontStyle: .italic,
+          fontSize: textSize,
+        ),
+      ),
+      style: ButtonStyle(),
+      clipBehavior: .hardEdge,
+    );
+  }
 }
