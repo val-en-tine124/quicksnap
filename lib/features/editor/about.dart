@@ -3,6 +3,8 @@ import 'dart:math';
 import 'dart:ui';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/material.dart';
+import 'package:quicksnap/features/widgets.dart';
+import 'package:url_launcher/url_launcher.dart' as launcher;
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -17,7 +19,34 @@ class AboutPage extends StatelessWidget {
             fit: BoxFit.cover,
           ),
         ),
-        child: Center(child: GlassBox()),
+        child: Column(
+          mainAxisAlignment: .center,
+          children: [
+            GlassBox(),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Row(
+                mainAxisAlignment: .center,
+                children: [
+                  CustomImageButton(imagePath: "assets/icons/bmc-button.png",onTap: () {
+                    launcher.launchUrl(Uri.parse(""));
+                  }),
+                  ImageCardButton(
+                    color: Colors.white,
+                    iconPath: "assets/icons/github.png",
+                    imageText: "GitHub",
+                    textSize: 20.0,
+                    textBgColor: Colors.white,
+                    textFgColor: Colors.black,
+                    onTap: () {
+                      launcher.launchUrl(Uri.parse("https://github.com/val-en-tine124"));
+                    }
+                  )
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -29,34 +58,36 @@ class GlassBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final borderRadius = BorderRadius.circular(20.0);
-    return ClipRRect(
-      borderRadius: borderRadius,
-      child: SizedBox(
-        width: 300.0,
-        height: 300.0,
-        child: Stack(
-          children: [
-            //Blur effect
-            BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-              child: Container(),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                border: .all(color: Colors.white.withValues(alpha: 0.2)),
-                borderRadius: borderRadius,
-                gradient: LinearGradient(
-                  begin: .topLeft,
-                  end: .bottomRight,
-                  colors: [
-                    Colors.white.withValues(alpha: 0.4),
-                    Colors.white.withValues(alpha: 0.1),
-                  ],
+    return Center(
+      child: ClipRRect(
+        borderRadius: borderRadius,
+        child: SizedBox(
+          width: 300.0,
+          height: 300.0,
+          child: Stack(
+            children: [
+              //Blur effect
+              BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                child: Container(),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  border: .all(color: Colors.white.withValues(alpha: 0.2)),
+                  borderRadius: borderRadius,
+                  gradient: LinearGradient(
+                    begin: .topLeft,
+                    end: .bottomRight,
+                    colors: [
+                      Colors.white.withValues(alpha: 0.4),
+                      Colors.white.withValues(alpha: 0.1),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            AuthorInfo(),
-          ],
+              AuthorInfo(),
+            ],
+          ),
         ),
       ),
     );
@@ -73,10 +104,12 @@ class AuthorInfo extends StatefulWidget {
 class _AuthorInfoState extends State<AuthorInfo> {
   late ValueNotifier<Color> color;
   late Timer timer;
+  late Random randgen;
   @override
   void initState() {
     super.initState();
     color = ValueNotifier(Colors.blue);
+    randgen = Random();
     timer = Timer.periodic(Duration(seconds: 1), (t) {
       List<Color> colorList = [
         Colors.red,
@@ -87,7 +120,7 @@ class _AuthorInfoState extends State<AuthorInfo> {
         Colors.indigo,
         Colors.purple,
       ];
-      final nextInt = Random().nextInt(7);
+      final nextInt = randgen.nextInt(7);
       color.value = colorList[nextInt];
     });
   }
