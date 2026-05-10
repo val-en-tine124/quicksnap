@@ -11,7 +11,10 @@ class SettingsUI extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("QuickSnap Settings", style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          "QuickSnap Settings",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
       body: const _SettingsBody(),
     );
@@ -39,13 +42,15 @@ class _SettingsBody extends StatelessWidget {
         const _SectionHeader("Editor"),
         Consumer(
           builder: (context, ref, _) {
+            
             final autoFocus = ref.watch(currentAutoFocusProvider);
             return SwitchListTile(
               title: const Text("Auto Focus"),
               subtitle: const Text("Toggle the text editor cursor focus"),
               value: autoFocus,
-              onChanged: (value) =>
-                  ref.read(settingsStateProvider.notifier).changeAutoFocus(value),
+              onChanged: (value) => ref
+                  .read(settingsStateProvider.notifier)
+                  .changeAutoFocus(value),
             );
           },
         ),
@@ -56,32 +61,37 @@ class _SettingsBody extends StatelessWidget {
               title: const Text("Editor Expand"),
               subtitle: const Text("Toggle the text editor expansion"),
               value: editorExpand,
-              onChanged: (value) =>
-                  ref.read(settingsStateProvider.notifier).changeEditorExpand(value),
+              onChanged: (value) => ref
+                  .read(settingsStateProvider.notifier)
+                  .changeEditorExpand(value),
             );
           },
         ),
-        
+
         ListTile(
           title: const Text("Editor padding"),
-          subtitle: const Text("Choose padding/spacing between the editor and your text"),
+          subtitle: const Text(
+            "Choose padding/spacing between the editor and your text",
+          ),
           onTap: () {
             showDialog(
-                context: context,
-                builder: (context) => const _PaddingSettingDialog(),
+              context: context,
+              builder: (context) => const _PaddingSettingDialog(),
             );
           },
         ),
         const _SectionHeader("Styling"),
         Consumer(
           builder: (context, ref, _) {
-            final colorValue  = ref.watch(currentUserColorProvider);
+            final colorValue = ref.watch(currentUserColorProvider);
             return ColorButtonTray(
               colors: UserColorEnum.values,
               value: colorValue,
-              onTap: (color)=>ref.read(settingsStateProvider.notifier).changeColor(color),
+              onTap: (color) =>
+                  ref.read(settingsStateProvider.notifier).changeColor(color),
             );
-          }),
+          },
+        ),
       ],
     );
   }
@@ -97,12 +107,13 @@ class _SectionHeader extends StatelessWidget {
       padding: const EdgeInsets.all(16.0),
       child: Text(
         title,
-        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+        style: Theme.of(
+          context,
+        ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
       ),
     );
   }
 }
-
 
 class _PaddingSettingDialog extends ConsumerWidget {
   const _PaddingSettingDialog();
@@ -113,14 +124,18 @@ class _PaddingSettingDialog extends ConsumerWidget {
       title: const Text("Select padding size"),
       content: Slider(
         value: editorPadding,
-        onChanged: (value) => ref.read(settingsStateProvider.notifier).changeEditorPadding(value),
+        onChanged: (value) =>
+            ref.read(settingsStateProvider.notifier).changeEditorPadding(value),
         min: 0,
         max: 50,
         divisions: 10,
         label: editorPadding.round().toString(),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text("Done"))
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text("Done"),
+        ),
       ],
     );
   }
