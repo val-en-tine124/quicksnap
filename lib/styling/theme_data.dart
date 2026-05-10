@@ -11,6 +11,11 @@ class AppThemeData {
     return ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(seedColor: seedColor),
+      snackBarTheme: SnackBarThemeData(
+        elevation: 7.0,
+        behavior: .floating,
+        insetPadding: .symmetric(vertical: 10.0,horizontal: 10.0)
+      ),
       textTheme: _buildTextTheme(),
       cardTheme: CardThemeData(
         elevation: 0,
@@ -20,6 +25,7 @@ class AppThemeData {
         ),
       ),
       listTileTheme: _buildListTileTheme(),
+      progressIndicatorTheme: ProgressIndicatorThemeData(year2023: false),
     );
   }
 
