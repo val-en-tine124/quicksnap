@@ -174,3 +174,93 @@ class ImageCardButton extends StatelessWidget {
     );
   }
 }
+
+///THis is a rainbow text, that repeatedly animate itself with the colors of the rainbow.
+class RainBowButton extends StatelessWidget {
+  final String text;
+  final void Function() onPressed;
+  const RainBowButton({super.key, required this.text, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: 2.seconds,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.red,
+            Colors.orange,
+            Colors.yellow,
+            Colors.green,
+            Colors.blue,
+            Colors.indigo,
+            Colors.purple,
+          ],
+          begin: .topLeft,
+          end: .bottomRight,
+        ),
+      ),
+      child: TextButton(onPressed: onPressed, child: Text(text)),
+    );
+  }
+}
+
+class RainBowText extends StatefulWidget {
+  final String text;
+  const RainBowText({super.key, required this.text});
+
+  @override
+  State<RainBowText> createState() => _RainBowTextState();
+}
+
+class _RainBowTextState extends State<RainBowText>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController controller;
+  @override
+  void initState() {
+    super.initState();
+    controller = AnimationController(duration: 5.seconds, vsync: this)
+      ..repeat();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: controller,
+        child: Text(
+          widget.text,
+          style: TextStyle(fontWeight: .w400, fontSize: 15),
+        ),
+        builder: (context, child) {
+          return ShaderMask(
+            shaderCallback: (bounds) {
+              return LinearGradient(
+                begin: .topLeft,
+                end: .bottomRight,
+                colors: [
+                  Colors.red,
+                  Colors.orange,
+                  Colors.yellow,
+                  Colors.green,
+                  Colors.blue,
+                  Colors.indigo,
+                  Colors.purple,
+                ],
+                tileMode: .mirror,
+                transform: GradientRotation(12),
+              ).createShader(Offset.zero & bounds.size);
+            },
+            child: child,
+          );
+        },
+      ),
+    );
+  }
+}
