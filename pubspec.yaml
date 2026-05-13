@@ -60,6 +60,7 @@ dependencies:
   package_info_plus: ^9.0.0
   flutter_launcher_icons: ^0.14.4
   collection: ^1.19.1
+  icons_plus: ^5.0.0
 
 dev_dependencies:
   flutter_test:
