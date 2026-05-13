@@ -4,6 +4,8 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:quicksnap/features/editor/about.dart';
 import 'package:quicksnap/features/editor/providers.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:quicksnap/features/editor_save_on_exit/providers.dart';
+import 'package:quicksnap/features/editor_save_on_exit/ui.dart';
 import 'package:quicksnap/features/settings/models.dart';
 import 'package:quicksnap/features/settings/providers.dart';
 import 'package:quicksnap/features/settings/ui.dart';
@@ -14,12 +16,46 @@ class EditorScaffold extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final fileData = ref.watch(appBarTitleProvider);
+    final fileTitle = ref.watch(appBarTitleProvider);
+    final fileState = ref.watch(filePickerProvider);
+    final settingsState = ref.watch(settingsStateProvider);
+    final editorInitialContentState = ref.watch(editorInitialContentProvider);
+    final isLoading =
+        fileState.isLoading ||
+        settingsState.isLoading ||
+        editorInitialContentState.isLoading;
+
+    // Show error snackbar when file picker encounters an error
+    if (fileState.hasError) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        customScaffoldMessenger(context, Text("Error: ${fileState.error}"));
+      });
+    }
+
+    // Show error snackbar when settings encounter an error
+    if (settingsState.hasError) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+       customScaffoldMessenger(
+          context,
+          Text("Settings Error: ${settingsState.error}"),
+        );
+      });
+    }
+
+    // Show error snackbar when editor initial content encounters an error
+    if (editorInitialContentState.hasError) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        customScaffoldMessenger(
+          context,
+          Text("Content Error: ${editorInitialContentState.error}"),
+        );
+      });
+    }
 
     return Scaffold(
       appBar: AppBar(
         title: RepaintBoundary(
-          child: Center(child: Text(fileData, style: TextStyle(fontSize: 16))),
+          child: Center(child: Text(fileTitle, style: TextStyle(fontSize: 16))),
         ),
         actions: [
           IconButton(
@@ -37,19 +73,25 @@ class EditorScaffold extends ConsumerWidget {
         ],
       ),
       body: const _Editor(),
-      drawer: Drawer(
-        child: Center(
-          child: Column(
-            children: [
-              Expanded(
-                child: const DrawerFsOps(),
-              ), // Let DrawerFsOps take up the remaining space in the column
-              //after AboutSection has use up it required space.
-              AboutSection(),
-            ],
-          ),
-        ),
-      ),
+      // Disable drawer when loading
+      drawer: isLoading
+          ? null
+          : Drawer(
+              child: Center(
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: const DrawerFsOps(),
+                    ), // Let DrawerFsOps take up the remaining space in the column
+                    //after AboutSection has use up it required space.
+                    AboutSection(),
+                  ],
+                ),
+              ),
+            ),
+      // Also disable drawer opening via gestures when loading
+      drawerEnableOpenDragGesture: !isLoading,
+      
     );
   }
 }
@@ -57,23 +99,47 @@ class EditorScaffold extends ConsumerWidget {
 ///This is My app Editor
 class _Editor extends ConsumerWidget {
   const _Editor();
+  Widget _showSpinner(String spinnerText) {
+    return Container(
+      width: 150.0,
+      height: 150.0,
+      color: Colors.black26,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text(spinnerText),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.watch(quillControllerProvider);
+    final fileState = ref.watch(filePickerProvider);
     final quickSnapSettings =
         ref.watch(settingsStateProvider).value ??
         QuickSnapSettings.getDefault();
 
-    return Column(
+    return Stack(
       children: [
-        Expanded(
-          child: QuillEditor.basic(
-            controller: controller,
-            config: quickSnapSettings.quillEditorConfig(),
-          ),
-        ),
+        Column(
+          children: [
+            Expanded(
+              child: QuillEditor.basic(
+                controller: controller,
+                config: quickSnapSettings.quillEditorConfig(),
+              ),
+            ),
 
-        _EditorToolBar(controller),
+            _EditorToolBar(controller),
+          ],
+        ),
+        if (fileState.isLoading) Center(child: _showSpinner("Loading ...")),
       ],
     );
   }
@@ -125,82 +191,69 @@ class AboutSection extends StatelessWidget {
 class DrawerFsOps extends ConsumerWidget {
   const DrawerFsOps({super.key});
 
-  Widget _showSpinner(String spinnerText) {
-    return Center(
-      child: Column(
-        children: [
-          CircularProgressIndicator(),
-          Padding(padding: EdgeInsetsGeometry.all(4), child: Text(spinnerText)),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final fileData = ref.read(filePickerProvider.notifier);
+    final fileState = ref.watch(filePickerProvider);
+    final settingsState = ref.watch(settingsStateProvider);
+    final isEdited = ref.watch(isEditedProvider);
+    final isLoading = fileState.isLoading || settingsState.isLoading;
+
     final fileOpsButtons = <Widget>[
       ListTile(
-        onTap: () {
-          fileData.newFile();
-          if (!context.mounted) return;
-          Navigator.pop(context);
-          ref
-              .read(filePickerProvider)
-              .when(
-                data: (data) {},
-                error: (e, s) =>
-                    customScaffoldMessenger(context, Text("Error: $e")),
-                loading: () => _showSpinner("Creating an empty file ..."),
-              );
-        },
+        onTap: isLoading
+            ? null
+            : () async {
+                if (isEdited) await saveOnExitDialog(context, ref);
+                fileData.newFile();
+                if (!context.mounted) return;
+                Navigator.pop(context);
+              },
         leading: const Icon(Icons.add),
         title: const Text("New File"),
         trailing: const Icon(Icons.arrow_forward_ios),
+        enabled: !isLoading,
       ),
       ListTile(
-        onTap: () {
-          fileData.saveFile();
-          if (!context.mounted) return;
-          Navigator.pop(context);
-          ref
-              .read(filePickerProvider)
-              .when(
-                data: (data) => customScaffoldMessenger(
-                  context,
-                  Text("File saved successfully"),
-                ),
-                error: (e, s) =>
-                    customScaffoldMessenger(context, Text("Error: $e")),
-                loading: () => _showSpinner("Saving file ..."),
-              );
-        },
+        onTap: isLoading
+            ? null
+            : () {
+                fileData.saveFile();
+                if (!context.mounted) return;
+                Navigator.pop(context);
+                if (fileState.hasValue) {
+                  customScaffoldMessenger(
+                    context,
+                    Text("File saved successfully"),
+                  );
+                }
+              },
         leading: const Icon(Icons.save),
         title: const Text("Save File"),
         trailing: const Icon(Icons.arrow_forward_ios),
+        enabled: !isLoading,
       ),
       ListTile(
-        onTap: () async {
-          await fileData.pickFile();
-          if (!context.mounted) return;
-          Navigator.pop(context);
-          ref
-              .read(filePickerProvider)
-              .when(
-                data: (data) => data != null
-                    ? customScaffoldMessenger(
-                        context,
-                        Text("Opened file successfully: ${data.name}"),
-                      )
-                    : null,
-                error: (e, s) =>
-                    customScaffoldMessenger(context, Text("Error: $e")),
-                loading: () {},
-              );
-        },
+        onTap: isLoading
+            ? null
+            : () async {
+                if (isEdited) await saveOnExitDialog(context, ref);
+                await fileData.pickFile();
+                if (!context.mounted) return;
+                Navigator.pop(context);
+                if (fileState.hasValue) {
+                  customScaffoldMessenger(
+                    context,
+                    Text(
+                      "Opened file successfully: ${fileState.asData?.value?.name ?? ""}",
+                    ),
+                  );
+                }
+              },
         leading: const Icon(Icons.folder_open),
         title: const Text("Open File"),
         trailing: const Icon(Icons.arrow_forward_ios),
+        enabled: !isLoading,
       ),
     ];
     return ListView(
