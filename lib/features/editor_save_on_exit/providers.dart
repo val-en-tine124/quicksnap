@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:quicksnap/features/editor/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -24,10 +25,21 @@ class EditorInitialContent extends _$EditorInitialContent {
 
 @riverpod
 class IsEdited extends _$IsEdited {
+  StreamSubscription? _changesSubscription;
+
   @override
   bool build() {
     final quillController = ref.watch(quillControllerProvider);
     final previousDeltaAsync = ref.watch(editorInitialContentProvider);
+
+    // Cancel any existing subscription
+    _changesSubscription?.cancel();
+    _changesSubscription = null;
+
+    // Set up cleanup
+    ref.onDispose(() {
+      _changesSubscription?.cancel();
+    });
 
     // Handle async state - only proceed when we have data
     return previousDeltaAsync.maybeMap(
@@ -35,14 +47,21 @@ class IsEdited extends _$IsEdited {
         final previousDeltaJson = previousDelta.value;
         if (previousDeltaJson.isEmpty) return false;
 
-        quillController.changes.listen((_) {
-          final currentDelta = quillController.document.toDelta();
-          final eq = DeepCollectionEquality();
-          state =
-              !eq.equals(currentDelta.toJson(), previousDeltaJson);
+        // Compare current document with initial content
+        final currentDelta = quillController.document.toDelta();
+        final eq = DeepCollectionEquality();
+        final isDifferent = !eq.equals(
+          currentDelta.toJson(),
+          previousDeltaJson,
+        );
+
+        // Set up listener for future changes
+        _changesSubscription = quillController.changes.listen((_) {
+          final newCurrentDelta = quillController.document.toDelta();
+          state = !eq.equals(newCurrentDelta.toJson(), previousDeltaJson);
         });
 
-        return false;
+        return isDifferent;
       },
       orElse: () => false,
     );
