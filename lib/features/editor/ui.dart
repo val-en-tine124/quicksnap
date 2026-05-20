@@ -1,6 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:quicksnap/features/app_update/models.dart';
+import 'package:quicksnap/features/app_update/providers.dart';
+import 'package:quicksnap/features/app_update/ui.dart';
 import 'package:quicksnap/features/editor/about.dart';
 import 'package:quicksnap/features/editor/providers.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -11,11 +14,57 @@ import 'package:quicksnap/features/settings/providers.dart';
 import 'package:quicksnap/features/settings/ui.dart';
 import '../widgets.dart';
 
-class EditorScaffold extends ConsumerWidget {
+class EditorScaffold extends ConsumerStatefulWidget {
   const EditorScaffold({super.key});
 
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<EditorScaffold> createState() => _EditorScaffoldState();
+}
+
+class _EditorScaffoldState extends ConsumerState<EditorScaffold> {
+   bool _dialogShown = false;
+  Future<void> _showUpdateDialog(
+    BuildContext context,
+    UpdateConfig config,
+    bool isMandatory,
+  ) async {
+    await showDialog<bool>(
+      context: context,
+      barrierDismissible: !isMandatory,
+      builder: (context) =>
+          QuickSnapUpdateDialog(updateConfig: config, isMandatory: isMandatory),
+    );
+
+    _dialogShown = false;
+  }
+  @override
+  void initState() {
+    super.initState();
+    // Check for updates after the widget is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(updateAvailabilityProvider.notifier).checkForUpdates();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Watch the update availability provider
+    ref.listen<AsyncValue<UpdateAvailabilityState>>(
+      updateAvailabilityProvider,
+      (previous, next) {
+        next.whenData((state) {
+          if (state.isUpdateAvailable &&
+              state.updateConfig != null &&
+              !_dialogShown &&
+              mounted) {
+            _dialogShown = true;
+            _showUpdateDialog(context, state.updateConfig!, state.isMandatory);
+          }
+          });
+      });
+
+
     final fileTitle = ref.watch(appBarTitleProvider);
     final fileState = ref.watch(filePickerProvider);
     final settingsState = ref.watch(settingsStateProvider);
@@ -35,7 +84,7 @@ class EditorScaffold extends ConsumerWidget {
     // Show error snackbar when settings encounter an error
     if (settingsState.hasError) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-       customScaffoldMessenger(
+        customScaffoldMessenger(
           context,
           Text("Settings Error: ${settingsState.error}"),
         );
@@ -72,7 +121,7 @@ class EditorScaffold extends ConsumerWidget {
           ),
         ],
       ),
-      body: const _Editor(),
+      body: Stack(children: [const _Editor()]),
       // Disable drawer when loading
       drawer: isLoading
           ? null
@@ -91,7 +140,6 @@ class EditorScaffold extends ConsumerWidget {
             ),
       // Also disable drawer opening via gestures when loading
       drawerEnableOpenDragGesture: !isLoading,
-      
     );
   }
 }
