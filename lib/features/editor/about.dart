@@ -45,7 +45,18 @@ class AboutPage extends StatelessWidget {
 
               children: [
                 const GlassBox(),
-                const SizedBox(height: 50),
+                const SizedBox(height: 20.0),
+                Text(
+                  "A tip will keep the product improving 👇",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontFamily: "Gilroy",
+                    fontStyle: FontStyle.italic,
+                    fontWeight: .w300,
+                    color: kSecondaryTextColor,
+                  ),
+                ),
+                const SizedBox(height: 10.0,),
                 const SupportButton(),
                 const SizedBox(height: 50.0),
                 FutureBuilder<PackageInfo>(
@@ -378,13 +389,16 @@ class _AuthorInfoState extends State<AuthorInfo> {
           crossAxisAlignment: WrapCrossAlignment.center,
 
           children: [
-            Text(
-              "A compact cross-platform text editor app.",
-              style: TextStyle(
-                fontSize: 16,
-                fontFamily: "Gilroy",
-                fontStyle: FontStyle.italic,
-                color: kSecondaryTextColor,
+            Padding(
+              padding: EdgeInsets.only(bottom:8.0),
+              child: Text(
+                "A compact cross-platform text editor app.",
+                style: TextStyle(
+                  fontSize: 15,
+                  fontFamily: "Gilroy",
+                  fontStyle: FontStyle.italic,
+                  color: kSecondaryTextColor,
+                ),
               ),
             ),
             Row(
@@ -403,7 +417,8 @@ class _AuthorInfoState extends State<AuthorInfo> {
                   style: TextStyle(
                     fontSize: 16,
                     fontFamily: "Gilroy",
-                    fontStyle: FontStyle.italic,
+                    fontStyle: FontStyle.normal,
+                    fontWeight: .w400,
                     color: kSecondaryTextColor,
                   ),
                 ),
@@ -456,6 +471,17 @@ class _AuthorInfoState extends State<AuthorInfo> {
 
             // Short label 'Email' opens mail composer
           ],
+        ),
+        Spacer(),
+        Text(
+          "Enjoying QuickSnap ?",
+          style: TextStyle(
+            fontSize: 16,
+            fontFamily: "Gilroy",
+            fontStyle: FontStyle.normal,
+            fontWeight: .w300,
+            color: kSecondaryTextColor,
+          ),
         ),
       ],
     );
@@ -556,7 +582,7 @@ class _GentleRotatingQState extends State<GentleRotatingQ>
           offset: Offset(dx, 0),
           child: Transform.rotate(
             angle: angle,
-            child: Transform.scale(scale: scale, child: Text("❤️")),
+            child: Transform.scale(scale: scale, child: Text("❤️",style:TextStyle(fontSize: 15.0))),
           ),
         );
       },
