@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
+import 'package:quicksnap/features/app_update/ui.dart';
 import 'package:quicksnap/features/editor_save_on_exit/ui.dart';
 import 'package:quicksnap/styling/theme_data.dart';
 import 'package:quicksnap/features/settings/hive_registrar.g.dart';
@@ -43,7 +44,9 @@ class QuickSnapApp extends ConsumerWidget {
       ],
       supportedLocales: const [Locale('en')],
 
-      home: SaveOnExit(editorScaffold: EditorScaffold(),),
+      home: UpdateChecker(
+        child: SaveOnExit(editorScaffold: EditorScaffold(),),
+      ),
     );
   }
 }

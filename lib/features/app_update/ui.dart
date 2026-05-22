@@ -128,8 +128,8 @@ class QuicksnapUpdateProgressBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.black26,
       decoration: BoxDecoration(
+        color: Colors.black26,
         border: Border.all(width: 2.0, style: BorderStyle.solid),
         borderRadius: const BorderRadius.all(Radius.circular(7.0)),
       ),
@@ -149,11 +149,24 @@ class QuicksnapUpdateProgressBar extends StatelessWidget {
   }
 }
 
-/// A widget that checks for updates and shows the dialog if available.
+/// A decorator widget that checks for updates and shows the dialog if available.
 ///
-/// This widget can be placed anywhere in the widget tree to enable
-/// automatic update checking. Add it to your home screen or main widget.
+/// Use this as a wrapper around your app's root widget to enable automatic
+/// update checking on startup. It listens to the update availability provider
+/// and displays the update dialog when a new version is detected.
+///
+/// Example:
+/// ```dart
+/// UpdateChecker(
+///   child: SaveOnExit(
+///     child: EditorScaffold(),
+///   ),
+/// )
+/// ```
 class UpdateChecker extends ConsumerStatefulWidget {
+  /// The child widget to be wrapped by this decorator.
+  final Widget child;
+
   /// Optional callback when an update is found and accepted.
   final VoidCallback? onUpdateStarted;
 
@@ -162,6 +175,7 @@ class UpdateChecker extends ConsumerStatefulWidget {
 
   const UpdateChecker({
     super.key,
+    required this.child,
     this.onUpdateStarted,
     this.onNoUpdate,
   });
@@ -202,8 +216,8 @@ class _UpdateCheckerState extends ConsumerState<UpdateChecker> {
       },
     );
 
-    // This widget doesn't render anything visible
-    return const SizedBox.shrink();
+    // Pass through the child widget — this is a decorator pattern
+    return widget.child;
   }
 
   Future<void> _showUpdateDialog(
