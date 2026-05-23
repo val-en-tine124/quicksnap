@@ -1,20 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:path/path.dart';
 import 'package:quicksnap/features/app_update/models.dart';
-import 'package:quicksnap/features/app_update/providers.dart';
 import 'package:quicksnap/features/app_update/ui.dart';
 
 void main() {
   group('QuickSnapUpdateDialog', () {
-    final testConfig = UpdateConfig(
-      latestVersion: '2.0.0',
-      downloadUrlV8a: 'https://example.com/app.apk',
-      downloadUrlV7a: 'https://example.com/app.apk',
-      isMandatory: false,
-      releaseNotes: 'New features and bug fixes',
-    );
 
     testWidgets('displays update title', (WidgetTester tester) async {
       await tester.pumpWidget(

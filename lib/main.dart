@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
-import 'package:quicksnap/features/app_update/models.dart';
 import 'package:quicksnap/features/app_update/ui.dart';
 import 'package:quicksnap/features/editor_save_on_exit/ui.dart';
 import 'package:quicksnap/styling/theme_data.dart';
