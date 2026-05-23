@@ -46,15 +46,21 @@ class AboutPage extends StatelessWidget {
               children: [
                 const GlassBox(),
                 const SizedBox(height: 20.0),
-                Text(
-                  "A tip will keep the product improving 👇",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: "Gilroy",
-                    fontStyle: FontStyle.italic,
-                    fontWeight: .w300,
-                    color: kSecondaryTextColor,
-                  ),
+                Wrap(
+                  children: [
+                    const Text(
+                      "A tip will keep the product improving ",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontFamily: "Gilroy",
+                        fontStyle: FontStyle.italic,
+                        fontWeight: .w300,
+                        color: kSecondaryTextColor,
+                      ),
+                    ),
+                    
+                    const GentleRotatingQ(rotatingObject:"👇",size: 40.0,),
+                  ],
                 ),
                 const SizedBox(height: 10.0,),
                 const SupportButton(),
@@ -381,7 +387,7 @@ class _AuthorInfoState extends State<AuthorInfo> {
                 );
               },
             ),
-            const GentleRotatingQ(),
+            const GentleRotatingQ(rotatingObject: "❤️",),
           ],
         ),
         const Wrap(
@@ -406,7 +412,7 @@ class _AuthorInfoState extends State<AuthorInfo> {
                 Text(
                   "Coded by:",
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     fontFamily: "Gilroy",
                     fontStyle: FontStyle.italic,
                     color: kSecondaryTextColor,
@@ -472,7 +478,7 @@ class _AuthorInfoState extends State<AuthorInfo> {
             // Short label 'Email' opens mail composer
           ],
         ),
-        Spacer(),
+        const Spacer(),
         Text(
           "Enjoying QuickSnap ?",
           style: TextStyle(
@@ -539,7 +545,8 @@ class _InfoPill extends StatelessWidget {
 // A calming, natural-looking rotating flower using a sinusoidal motion.
 class GentleRotatingQ extends StatefulWidget {
   final double size;
-  const GentleRotatingQ({this.size = 28, super.key});
+  final String rotatingObject;
+  const GentleRotatingQ({this.size = 28,required this.rotatingObject, super.key});
 
   @override
   State<GentleRotatingQ> createState() => _GentleRotatingQState();
@@ -582,7 +589,7 @@ class _GentleRotatingQState extends State<GentleRotatingQ>
           offset: Offset(dx, 0),
           child: Transform.rotate(
             angle: angle,
-            child: Transform.scale(scale: scale, child: Text("❤️",style:TextStyle(fontSize: 15.0))),
+            child: Transform.scale(scale: scale, child: Text(widget.rotatingObject,style:TextStyle(fontSize: 15.0))),
           ),
         );
       },
