@@ -1,6 +1,8 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:android_intent_plus/android_intent.dart';
@@ -210,19 +212,31 @@ class AppUpdateUtils {
     }
 
     try {
+      // Resolve the content URI via the native method channel
+      // to avoid FileUriExposedException on Android 10+
+      const channel = MethodChannel('com.quicksnap/file_provider');
+      final contentUri = await channel.invokeMethod<String>('getContentUri', {
+        'filePath': apkFile.path,
+      });
+
+      if (contentUri == null) {
+        throw Exception('Failed to resolve content URI for APK file');
+      }
+
       // Use android_intent_plus to trigger the package installer
       final intent = AndroidIntent(
         action: 'action_view',
-        data: 'file://${apkFile.path}',
+        data: contentUri,
         type: 'application/vnd.android.package-archive',
         flags: <int>[
           0x10000000, // FLAG_ACTIVITY_NEW_TASK
+          0x00000001, // FLAG_GRANT_READ_URI_PERMISSION
         ],
       );
-
+      log("Preparing to launch android intent for installation of update at:${apkFile.path}",name: "installApk",level: 800);
       await intent.launch();
     } catch (e) {
-      // Fallback: Try using an open_file approach
+      log("Failed to launch android intent for installation of update at:${apkFile.path}\nconsider falling back to open_file approach",name: "installApk",error:e ,level: 1000);
       throw Exception('Failed to launch package installer: $e');
     }
   }
