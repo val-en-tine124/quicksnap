@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
+import 'package:quicksnap/features/app_update/models.dart';
 import 'package:quicksnap/features/app_update/ui.dart';
 import 'package:quicksnap/features/editor_save_on_exit/ui.dart';
 import 'package:quicksnap/styling/theme_data.dart';
@@ -14,11 +15,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter("quicksnap_data");
   Hive.registerAdapters();
-  final box = await Hive.openBox<QuickSnapSettings>("QuickSnapSettings");
+  final settingsBox = await Hive.openBox<QuickSnapSettings>("QuickSnapSettings");
+  await Hive.openBox("UpdateConfig");
 
   runApp(
     ProviderScope(
-      overrides: [settingsInHiveProvider.overrideWithValue(box)],
+      overrides: [settingsInHiveProvider.overrideWithValue(settingsBox)],
       child: const QuickSnapApp(),
     ),
   );

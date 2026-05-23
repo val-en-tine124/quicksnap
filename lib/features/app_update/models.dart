@@ -1,3 +1,7 @@
+import 'package:hive_ce_flutter/hive_flutter.dart';
+@GenerateAdapters([AdapterSpec<UpdateConfig>()])
+part 'models.g.dart';
+
 /// Represents the remote version configuration for app updates.
 /// 
 /// This model is used to parse the JSON response from the update server
