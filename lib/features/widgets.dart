@@ -81,7 +81,7 @@ ScaffoldFeatureController<SnackBar, SnackBarClosedReason>
 customScaffoldMessenger(BuildContext context, Text content) {
   return ScaffoldMessenger.of(
     context,
-  ).showSnackBar(SnackBar(content: content, duration: 7.seconds));
+  ).showSnackBar(SnackBar(content: content, duration: 4.seconds));
 }
 
 class CustomImageButton extends StatelessWidget {
