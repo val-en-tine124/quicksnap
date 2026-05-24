@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:developer' as dev;
 import 'dart:math';
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -23,7 +25,7 @@ class AboutPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Center(child: Text("About QuickSnap")),
+        title: const Center(child: Text("About QuickSnap")),
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios_new_rounded,
@@ -36,51 +38,21 @@ class AboutPage extends StatelessWidget {
         constraints: const BoxConstraints(
           maxWidth: 480,
         ), //create a BoxConstraint (parent of the Stack) box contraint of 480 pixels, required by the Stack
-        child: Stack(
+        child: const Stack(
           alignment: .center,
           children: [
-            const ParticleBackground(),
+            ParticleBackground(),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
 
               children: [
-                const GlassBox(),
-                const SizedBox(height: 20.0),
-                Wrap(
-                  children: [
-                    const Text(
-                      "A tip will keep the product improving ",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: "Gilroy",
-                        fontStyle: FontStyle.italic,
-                        fontWeight: .w300,
-                        color: kSecondaryTextColor,
-                      ),
-                    ),
-                    
-                    const GentleRotatingQ(rotatingObject:"👇",size: 40.0,),
-                  ],
-                ),
-                const SizedBox(height: 10.0,),
-                const SupportButton(),
-                const SizedBox(height: 50.0),
-                FutureBuilder<PackageInfo>(
-                  future: PackageInfo.fromPlatform(),
-                  builder: (context, snapshot) {
-                    final ver = snapshot.hasData
-                        ? '2026© QuickSnap v${snapshot.data!.version}+${snapshot.data!.buildNumber}'
-                        : 'Not able to retrieve version';
-                    return Text(
-                      ver,
-                      style: const TextStyle(
-                        color: kSecondaryTextColor,
-                        fontSize: 12,
-                        fontFamily: 'Gilroy',
-                      ),
-                    );
-                  },
-                ),
+                GlassBox(),
+                SizedBox(height: 20.0),
+                AdditionalSupportInfo(),
+                SizedBox(height: 10.0,),
+                SupportButton(),
+                SizedBox(height: 50.0),
+                AppVersionInfo(),
               ],
             ),
           ],
@@ -90,6 +62,52 @@ class AboutPage extends StatelessWidget {
   }
 }
 
+class AppVersionInfo extends StatelessWidget {
+  const AppVersionInfo({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<PackageInfo>(
+      future: PackageInfo.fromPlatform(),
+      builder: (context, snapshot) {
+        final ver = snapshot.hasData
+            ? '2026© QuickSnap v${snapshot.data!.version}+${snapshot.data!.buildNumber}'
+            : 'Not able to retrieve version';
+        return Text(
+          ver,
+          style: const TextStyle(
+            color: kSecondaryTextColor,
+            fontSize: 12,
+            fontFamily: 'Gilroy',
+          ),
+        );
+      },
+    );
+  }
+}
+class AdditionalSupportInfo extends StatelessWidget {
+  const AdditionalSupportInfo({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Wrap(
+      children: [
+        Text(
+          "A tip will keep the product improving ",
+          style: TextStyle(
+            fontSize: 16,
+            fontFamily: "Gilroy",
+            fontStyle: FontStyle.italic,
+            fontWeight: .w300,
+            color: kSecondaryTextColor,
+          ),
+        ),
+
+        GentleRotatingQ(rotatingObject: "👇", size: 40.0),
+      ],
+    );
+  }
+}
 class SupportButton extends StatelessWidget {
   const SupportButton({super.key});
 
@@ -117,7 +135,7 @@ class SupportButton extends StatelessWidget {
       ),
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.red,
-        side: BorderSide(color: Colors.yellow, width: 2.0),
+        side: const BorderSide(color: Colors.yellow, width: 2.0),
         shape: RoundedRectangleBorder(borderRadius: .circular(12.0)),
       ),
     );
@@ -184,7 +202,7 @@ class _ParticleBackgroundState extends State<ParticleBackground>
         final now = DateTime.now().millisecondsSinceEpoch / 1000.0;
         final dt = (now - _lastTickSeconds).clamp(0.0, 0.05);
         _lastTickSeconds = now;
-
+    
         for (var p in _particles) {
           // decrease lifespan by real time
           p.lifespan -= dt;
@@ -193,7 +211,7 @@ class _ParticleBackgroundState extends State<ParticleBackground>
             p.position.dx + p.velocity.dx * dt,
             p.position.dy + p.velocity.dy * dt,
           );
-
+    
           // when particle dies, respawn at bottom with new random life/velocity
           if (p.lifespan <= 0) {
             p.position = Offset(
@@ -208,7 +226,7 @@ class _ParticleBackgroundState extends State<ParticleBackground>
               -(_random.nextDouble() * 0.02 + 0.002),
             );
           }
-
+    
           // wrap horizontally
           if (p.position.dx < -0.1) p.position = Offset(1.1, p.position.dy);
           if (p.position.dx > 1.1) p.position = Offset(-0.1, p.position.dy);
@@ -315,7 +333,7 @@ class GlassBox extends StatelessWidget {
                   color: kCardBackgroundColor,
                 ),
               ),
-              AuthorInfo(),
+              const AuthorInfo(),
             ],
           ),
         ),
@@ -340,7 +358,7 @@ class _AuthorInfoState extends State<AuthorInfo> {
     super.initState();
     color = ValueNotifier(Colors.blue);
     randgen = Random();
-    timer = Timer.periodic(Duration(seconds: 1), (t) {
+    timer = Timer.periodic(const Duration(seconds: 1), (t) {
       List<Color> colorList = [
         Colors.red,
         Colors.orange,
@@ -371,21 +389,23 @@ class _AuthorInfoState extends State<AuthorInfo> {
           crossAxisAlignment: WrapCrossAlignment.center,
           spacing: 4,
           children: [
-            ValueListenableBuilder(
-              valueListenable: color,
-              builder: (context, value, child) {
-                return Center(
-                  child: SelectableText(
-                    "QuickSnap",
-                    style: TextStyle(
-                      color: color.value,
-                      fontWeight: .w400,
-                      fontFamily: "Unageo",
-                      fontSize: 28,
+            RepaintBoundary(
+              child: ValueListenableBuilder(
+                valueListenable: color,
+                builder: (context, value, child) {
+                  return Center(
+                    child: SelectableText(
+                      "QuickSnap",
+                      style: TextStyle(
+                        color: color.value,
+                        fontWeight: .w400,
+                        fontFamily: "Unageo",
+                        fontSize: 28,
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
             const GentleRotatingQ(rotatingObject: "❤️",),
           ],
@@ -445,41 +465,26 @@ class _AuthorInfoState extends State<AuthorInfo> {
               icon: FontAwesome.github_brand,
               text: 'Maintainer',
               tooltip: "Follow him on Github",
-              onTap: () {
-                launcher.launchUrl(
-                  Uri.parse('https://github.com/val-en-tine124'),
-                  mode: launcher.LaunchMode.externalApplication,
-                );
-              },
+              onTap: () => launchExternalLink('https://github.com/val-en-tine124')
             ),
             _InfoPill(
               icon: FontAwesome.linkedin_brand,
               text: 'Linkedln',
               tooltip: "Check him out on Linkedln",
-              onTap: () {
-                launcher.launchUrl(
-                  Uri.parse('https://linkedin.com/in/valentine-abba-885b8139b'),
-                  mode: launcher.LaunchMode.externalApplication,
-                );
-              },
+              onTap: () => launchExternalLink('https://linkedin.com/in/valentine-abba-885b8139b')
             ),
             _InfoPill(
               icon: FontAwesome.telegram_brand,
               text: 'Telegram',
               tooltip: "Check him out on telegram",
-              onTap: () {
-                launcher.launchUrl(
-                  Uri.parse('https://t.me/val_400'),
-                  mode: launcher.LaunchMode.externalApplication,
-                );
-              },
+              onTap: () =>launchExternalLink('https://t.me/val_400')
             ),
 
             // Short label 'Email' opens mail composer
           ],
         ),
         const Spacer(),
-        Text(
+        const Text(
           "Enjoying QuickSnap ?",
           style: TextStyle(
             fontSize: 16,
@@ -542,7 +547,7 @@ class _InfoPill extends StatelessWidget {
   }
 }
 
-// A calming, natural-looking rotating flower using a sinusoidal motion.
+// A calming, natural-looking rotating object using a sinusoidal motion.
 class GentleRotatingQ extends StatefulWidget {
   final double size;
   final String rotatingObject;
@@ -584,15 +589,25 @@ class _GentleRotatingQState extends State<GentleRotatingQ>
         final scale = 1 + 0.03 * sin(t * 2 * pi);
         // Gentle horizontal sway in logical pixels
         final dx = 2.0 * sin(t * 2 * pi);
-
+    
         return Transform.translate(
           offset: Offset(dx, 0),
           child: Transform.rotate(
             angle: angle,
-            child: Transform.scale(scale: scale, child: Text(widget.rotatingObject,style:TextStyle(fontSize: 15.0))),
+            child: Transform.scale(scale: scale, child: Text(widget.rotatingObject,style:const TextStyle(fontSize: 15.0))),
           ),
         );
       },
     );
+  }
+}
+
+Future<void> launchExternalLink(String url) async {
+  final uri = Uri.parse(url);
+  if (!await launcher.canLaunchUrl(uri)) {
+    // Handle case where the device/app cannot open the link
+    dev.log('Could not launch $url',level: 1000,);
+  } else {
+    await launcher.launchUrl(uri, mode: launcher.LaunchMode.externalApplication);
   }
 }
