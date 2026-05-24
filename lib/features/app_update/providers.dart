@@ -57,7 +57,7 @@ Future<UpdateConfig?> remoteUpdateConfig(Ref ref) async {
     return null;
   } catch (e) {
     // Return cached config if available on network failure
-    final updateConfigCache = ref.watch(updateConfigCacheProvider);
+    final updateConfigCache = ref.read(updateConfigCacheProvider);
     return updateConfigCache.value;
   }
 }
@@ -115,7 +115,8 @@ class UpdateAvailability extends _$UpdateAvailability {
   /// Refreshes the update check.
   Future<void> checkForUpdates() async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(() => build());
+    ref.invalidateSelf();
+    state = AsyncValue.data(await future);
   }
 }
 
