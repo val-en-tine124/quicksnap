@@ -54,7 +54,7 @@ void main() {
 
     group('toJson', () {
       test('serializes all fields correctly', () {
-        final config = UpdateConfig(
+        const config = UpdateConfig(
           latestVersion: '3.0.0',
           downloadUrlV8a: 'https://example.com/app-v8a.apk',
           downloadUrlV7a: 'https://example.com/app-v7a.apk',
@@ -72,7 +72,7 @@ void main() {
       });
 
       test('excludes release_notes when null', () {
-        final config = UpdateConfig(
+        const config = UpdateConfig(
           latestVersion: '1.0.0',
           downloadUrlV8a: 'https://example.com/app-v8a.apk',
           downloadUrlV7a: 'https://example.com/app-v7a.apk',
@@ -85,7 +85,7 @@ void main() {
       });
 
       test('round-trip serialization', () {
-        final original = UpdateConfig(
+        const original = UpdateConfig(
           latestVersion: '2.1.0',
           downloadUrlV8a: 'https://example.com/app-v8a.apk',
           downloadUrlV7a: 'https://example.com/app-v7a.apk',
@@ -104,7 +104,7 @@ void main() {
 
     group('toString', () {
       test('returns formatted string with all fields', () {
-        final config = UpdateConfig(
+        const config = UpdateConfig(
           latestVersion: '1.2.3',
           downloadUrlV7a: 'https://example.com/app-v7a.apk',
           downloadUrlV8a: 'https://example.com/app-v8a.apk',
@@ -122,7 +122,7 @@ void main() {
       });
 
       test('returns formatted string without release notes', () {
-        final config = UpdateConfig(
+        const config = UpdateConfig(
           latestVersion: '1.0.0',
           downloadUrlV8a: 'https://example.com/app-v8a.apk',
           downloadUrlV7a: 'https://example.com/app-v7a.apk',

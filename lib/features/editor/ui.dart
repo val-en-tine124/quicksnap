@@ -1,14 +1,15 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quicksnap/features/editor/about.dart';
 import 'package:quicksnap/features/editor/providers.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:quicksnap/features/editor_save_on_exit/providers.dart';
 import 'package:quicksnap/features/editor_save_on_exit/ui.dart';
 import 'package:quicksnap/features/settings/models.dart';
 import 'package:quicksnap/features/settings/providers.dart';
 import 'package:quicksnap/features/settings/ui.dart';
+
 import '../widgets.dart';
 
 /// Editor scaffold with update checking functionality.
@@ -56,9 +57,7 @@ class EditorScaffold extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: RepaintBoundary(
-          child: Center(child: Text(fileTitle, style: TextStyle(fontSize: 16))),
-        ),
+        title: Center(child: Text(fileTitle, style: const TextStyle(fontSize: 16))),
         actions: [
           IconButton(
             tooltip: "Settings",
@@ -66,24 +65,24 @@ class EditorScaffold extends ConsumerWidget {
               if (context.mounted) {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => SettingsUI()),
+                  MaterialPageRoute(builder: (_) => const SettingsUI()),
                 );
               }
             },
-            icon: Icon(Icons.settings),
+            icon: const Icon(Icons.settings),
           ),
         ],
       ),
-      body: _Editor(),
+      body: const _Editor(),
       // Disable drawer when loading
       drawer: isLoading
           ? null
-          : Drawer(
+          : const Drawer(
               child: Center(
                 child: Column(
                   children: [
                     Expanded(
-                      child: const DrawerFsOps(),
+                      child: DrawerFsOps(),
                     ), // Let DrawerFsOps take up the remaining space in the column
                     //after AboutSection has use up it required space.
                     AboutSection(),
@@ -109,8 +108,8 @@ class _Editor extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
             Text(spinnerText),
           ],
         ),
@@ -157,7 +156,7 @@ class _EditorToolBar extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Theme.of(context).canvasColor,
-          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4.0)],
+          boxShadow: [const BoxShadow(color: Colors.black12, blurRadius: 4.0)],
         ),
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
@@ -181,7 +180,7 @@ class AboutSection extends StatelessWidget {
         if (context.mounted) {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => AboutPage()),
+            MaterialPageRoute(builder: (_) => const AboutPage()),
           );
         }
       },
@@ -225,7 +224,7 @@ class DrawerFsOps extends ConsumerWidget {
                 if (fileState.hasValue) {
                   customScaffoldMessenger(
                     context,
-                    Text("File saved successfully"),
+                    const Text("File saved successfully"),
                   );
                 }
               },

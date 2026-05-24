@@ -25,6 +25,10 @@ linter:
     # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
     - use_super_parameters
     - close_sinks
+    - prefer_const_constructors
+    - prefer_const_declarations
+    - prefer_const_constructors_in_immutables
+    - prefer_final_fields
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options

@@ -45,7 +45,7 @@ class QuickSnapApp extends ConsumerWidget {
       ],
       supportedLocales: const [Locale('en')],
 
-      home: UpdateChecker(
+      home: const UpdateChecker(
         child: SaveOnExit(editorScaffold: EditorScaffold(),),
       ),
     );

@@ -49,7 +49,7 @@ class IsEdited extends _$IsEdited {
 
         // Compare current document with initial content
         final currentDelta = quillController.document.toDelta();
-        final eq = DeepCollectionEquality();
+        const eq = DeepCollectionEquality();
         final isDifferent = !eq.equals(
           currentDelta.toJson(),
           previousDeltaJson,

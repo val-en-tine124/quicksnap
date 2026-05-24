@@ -149,11 +149,11 @@ class _ThemeSettingsDialog extends ConsumerWidget {
     final themeState = ref.watch(currentThemeProvider);
 
     return AlertDialog(
-      title: Text("Choose Theme"),
+      title: const Text("Choose Theme"),
 
       content: RadioGroup<ThemeMode>(
         groupValue: themeState,
-        child: Column(
+        child: const Column(
           mainAxisSize: .min,
           children: [
             RadioListTile<ThemeMode>(value: .system, title: Text("System")),

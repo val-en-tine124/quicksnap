@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quicksnap/features/settings/models.dart';
 import 'package:quicksnap/features/settings/providers.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AppThemeData {
   const AppThemeData._();
@@ -11,7 +11,7 @@ class AppThemeData {
     return ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(seedColor: seedColor),
-      snackBarTheme: SnackBarThemeData(
+      snackBarTheme: const SnackBarThemeData(
         elevation: 7.0,
         behavior: .floating,
         insetPadding: .symmetric(vertical: 10.0,horizontal: 10.0)
@@ -21,11 +21,11 @@ class AppThemeData {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: BorderSide(),
+          side: const BorderSide(),
         ),
       ),
       listTileTheme: _buildListTileTheme(),
-      progressIndicatorTheme: ProgressIndicatorThemeData(year2023: false),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(year2023: false),
     );
   }
 
@@ -45,7 +45,7 @@ class AppThemeData {
   static ListTileThemeData _buildListTileTheme() {
     return ListTileThemeData(
       shape: RoundedRectangleBorder(
-        side: BorderSide(style: .none),
+        side: const BorderSide(style: .none),
         borderRadius: BorderRadiusGeometry.circular(30),
       ),
       contentPadding: const .all(2.0),

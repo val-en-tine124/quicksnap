@@ -13,7 +13,7 @@ void main() {
         final state = UpdateAvailabilityState(
           isUpdateAvailable: false,
           currentVersion: '1.0.0',
-          updateConfig: UpdateConfig(
+          updateConfig: const UpdateConfig(
             latestVersion: '1.0.0',
             downloadUrlV8a: 'https://example.com/app.apk',
             downloadUrlV7a: 'https://example.com/app.apk',
@@ -28,7 +28,7 @@ void main() {
         final state = UpdateAvailabilityState(
           isUpdateAvailable: false,
           currentVersion: '2.1.3',
-          updateConfig: UpdateConfig(
+          updateConfig: const UpdateConfig(
             latestVersion: '2.1.3',
             downloadUrlV8a: 'https://example.com/app.apk',
             downloadUrlV7a: 'https://example.com/app.apk',
@@ -45,7 +45,7 @@ void main() {
         final state = UpdateAvailabilityState(
           isUpdateAvailable: true,
           currentVersion: '1.0.0',
-          updateConfig: UpdateConfig(
+          updateConfig: const UpdateConfig(
             latestVersion: '2.0.0',
             downloadUrlV8a: 'https://example.com/app.apk',
             downloadUrlV7a: 'https://example.com/app.apk',
@@ -60,7 +60,7 @@ void main() {
         final state = UpdateAvailabilityState(
           isUpdateAvailable: false,
           currentVersion: '3.0.0',
-          updateConfig: UpdateConfig(
+          updateConfig: const UpdateConfig(
             latestVersion: '2.0.0',
             downloadUrlV8a: 'https://example.com/app.apk',
             downloadUrlV7a: 'https://example.com/app.apk',
@@ -77,7 +77,7 @@ void main() {
         final state = UpdateAvailabilityState(
           isUpdateAvailable: true,
           currentVersion: '1.1.0',
-          updateConfig: UpdateConfig(
+          updateConfig: const UpdateConfig(
             latestVersion: '1.2.0',
             downloadUrlV8a: 'https://example.com/app.apk',
             downloadUrlV7a: 'https://example.com/app.apk',
@@ -92,7 +92,7 @@ void main() {
         final state = UpdateAvailabilityState(
           isUpdateAvailable: false,
           currentVersion: '1.5.0',
-          updateConfig: UpdateConfig(
+          updateConfig: const UpdateConfig(
             latestVersion: '1.4.0',
             downloadUrlV8a: 'https://example.com/app.apk',
             downloadUrlV7a: 'https://example.com/app.apk',
@@ -109,7 +109,7 @@ void main() {
         final state = UpdateAvailabilityState(
           isUpdateAvailable: true,
           currentVersion: '1.0.1',
-          updateConfig: UpdateConfig(
+          updateConfig: const UpdateConfig(
             latestVersion: '1.0.2',
             downloadUrlV8a: 'https://example.com/app.apk',
             downloadUrlV7a: 'https://example.com/app.apk',
@@ -124,7 +124,7 @@ void main() {
         final state = UpdateAvailabilityState(
           isUpdateAvailable: false,
           currentVersion: '1.0.5',
-          updateConfig: UpdateConfig(
+          updateConfig: const UpdateConfig(
             latestVersion: '1.0.3',
             downloadUrlV8a: 'https://example.com/app.apk',
             downloadUrlV7a: 'https://example.com/app.apk',
@@ -141,7 +141,7 @@ void main() {
         final state = UpdateAvailabilityState(
           isUpdateAvailable: true,
           currentVersion: '1.0',
-          updateConfig: UpdateConfig(
+          updateConfig: const UpdateConfig(
             latestVersion: '1.0.1',
             downloadUrlV8a: 'https://example.com/app.apk',
             downloadUrlV7a: 'https://example.com/app.apk',
@@ -156,7 +156,7 @@ void main() {
         final state = UpdateAvailabilityState(
           isUpdateAvailable: false,
           currentVersion: '1.0.0.1',
-          updateConfig: UpdateConfig(
+          updateConfig: const UpdateConfig(
             latestVersion: '1.0.0',
             downloadUrlV8a: 'https://example.com/app.apk',
             downloadUrlV7a: 'https://example.com/app.apk',
@@ -175,7 +175,7 @@ void main() {
         final state = UpdateAvailabilityState(
           isUpdateAvailable: true,
           currentVersion: '1.0.0',
-          updateConfig: UpdateConfig(
+          updateConfig: const UpdateConfig(
             latestVersion: '2.0.0',
             downloadUrlV8a: 'https://example.com/app.apk',
             downloadUrlV7a: 'https://example.com/app.apk',
@@ -190,7 +190,7 @@ void main() {
         final state = UpdateAvailabilityState(
           isUpdateAvailable: true,
           currentVersion: '1.0.0',
-          updateConfig: UpdateConfig(
+          updateConfig: const UpdateConfig(
             latestVersion: '2.0.0',
             downloadUrlV8a: 'https://example.com/app.apk',
             downloadUrlV7a: 'https://example.com/app.apk',
@@ -237,7 +237,7 @@ void main() {
 
   group('UpdateConfig in UpdateAvailabilityState', () {
     test('stores updateConfig correctly', () {
-      final config = UpdateConfig(
+      const config = UpdateConfig(
         latestVersion: '2.0.0',
         downloadUrlV8a: 'https://example.com/app.apk',
         downloadUrlV7a: 'https://example.com/app.apk',

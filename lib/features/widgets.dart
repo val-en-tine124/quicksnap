@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:quicksnap/features/settings/models.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -69,8 +71,8 @@ class CircularColorButton extends State<ColorButtonTray> {
             strokeAlign: BorderSide.strokeAlignOutside,
           ),
         ),
-        margin: .symmetric(horizontal: 10.0),
-        padding: .all(2.0),
+        margin: const .symmetric(horizontal: 10.0),
+        padding: const .all(2.0),
         child: CircleAvatar(backgroundColor: color.toMaterialColor()),
       ),
     );
@@ -169,7 +171,7 @@ class ImageCardButton extends StatelessWidget {
           fontSize: textSize,
         ),
       ),
-      style: ButtonStyle(),
+      style: const ButtonStyle(),
       clipBehavior: .hardEdge,
     );
   }
@@ -185,7 +187,7 @@ class RainBowButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedContainer(
       duration: 2.seconds,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [
             Colors.red,
@@ -216,6 +218,16 @@ class RainBowText extends StatefulWidget {
 class _RainBowTextState extends State<RainBowText>
     with SingleTickerProviderStateMixin {
   late final AnimationController controller;
+  static const _rainbowColors = [
+    Colors.red,
+    Colors.orange,
+    Colors.yellow,
+    Colors.green,
+    Colors.blue,
+    Colors.indigo,
+    Colors.purple,
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -236,7 +248,7 @@ class _RainBowTextState extends State<RainBowText>
         animation: controller,
         child: Text(
           widget.text,
-          style: TextStyle(fontWeight: .w400, fontSize: 15),
+          style: const TextStyle(fontWeight: .w400, fontSize: 15),
         ),
         builder: (context, child) {
           return ShaderMask(
@@ -244,17 +256,9 @@ class _RainBowTextState extends State<RainBowText>
               return LinearGradient(
                 begin: .topLeft,
                 end: .bottomRight,
-                colors: [
-                  Colors.red,
-                  Colors.orange,
-                  Colors.yellow,
-                  Colors.green,
-                  Colors.blue,
-                  Colors.indigo,
-                  Colors.purple,
-                ],
+                colors: _rainbowColors,
                 tileMode: .mirror,
-                transform: GradientRotation(12),
+                transform: GradientRotation(controller.value * 2 * pi ),
               ).createShader(Offset.zero & bounds.size);
             },
             child: child,

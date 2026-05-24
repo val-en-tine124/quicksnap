@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 part 'models.freezed.dart';
 
 /// This is a QuickSnapSettings Class that wraps the QuillEditorConfig
@@ -19,7 +20,7 @@ abstract class QuickSnapSettings with _$QuickSnapSettings {
   }) = _QuickSnapSettings;
 
   static  QuickSnapSettings getDefault(){
-    return QuickSnapSettings(
+    return const QuickSnapSettings(
         theme: ThemeMode.system,
         autoFocus: true,
         expands: true,

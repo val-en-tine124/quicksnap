@@ -102,7 +102,7 @@ void main() {
     testWidgets('shows mandatory update warning when isMandatory is true', (
       WidgetTester tester,
     ) async {
-      final config = UpdateConfig(
+      const config = UpdateConfig(
         latestVersion: '2.0.0',
         downloadUrlV8a: 'https://example.com/app.apk',
         downloadUrlV7a: 'https://example.com/app.apk',
@@ -110,7 +110,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        ProviderScope(
+        const ProviderScope(
           child: MaterialApp(
             home: QuickSnapUpdateDialog(
               updateConfig: config,
@@ -181,7 +181,7 @@ void main() {
     testWidgets('does not show "Later" button when update is mandatory', (
       WidgetTester tester,
     ) async {
-      final config = UpdateConfig(
+      const config = UpdateConfig(
         latestVersion: '2.0.0',
         downloadUrlV8a: 'https://example.com/app.apk',
         downloadUrlV7a: 'https://example.com/app.apk',
@@ -189,7 +189,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        ProviderScope(
+        const ProviderScope(
           child: MaterialApp(
             home: QuickSnapUpdateDialog(
               updateConfig: config,

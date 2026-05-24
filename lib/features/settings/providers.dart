@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 import './models.dart';
 
 @GenerateAdapters(
@@ -31,7 +32,7 @@ class SettingsState extends _$SettingsState {
     final stateTemp = settingsState;
     final stateValue = stateTemp.value!;
     final box = ref.read(settingsInHiveProvider);
-    state = AsyncLoading();
+    state = const AsyncLoading();
     box.put("settings", stateValue);
     state = AsyncData(stateValue);
   }
