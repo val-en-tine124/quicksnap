@@ -105,7 +105,9 @@ class QuickSnapUpdateDialog extends ConsumerWidget {
                   ? updateConfig.downloadUrlV8a
                   : updateConfig.downloadUrlV7a;
               // Start the download in the background
-              ref.read(updateDownloadStateProvider.notifier).downloadAndUpdate(
+              ref
+                  .read(updateDownloadStateProvider.notifier)
+                  .downloadAndUpdate(
                     downloadUrl: downloadUrl,
                     onProgress: (progress) => Center(
                       child: QuicksnapUpdateProgressBar(progress: progress),
@@ -140,8 +142,8 @@ class QuicksnapUpdateProgressBar extends StatelessWidget {
           LinearProgressIndicator(value: progress),
           const SizedBox(height: 16),
           const Text(
-            "Updating QuickSnap ...",
-            style: TextStyle(fontFamily: "Unageo", color: Colors.white),
+            'Updating QuickSnap ...',
+            style: TextStyle(fontFamily: 'Unageo', color: Colors.white),
           ),
         ],
       ),
@@ -228,10 +230,8 @@ class _UpdateCheckerState extends ConsumerState<UpdateChecker> {
     final shouldUpdate = await showDialog<bool>(
       context: context,
       barrierDismissible: !isMandatory,
-      builder: (context) => QuickSnapUpdateDialog(
-        updateConfig: config,
-        isMandatory: isMandatory,
-      ),
+      builder: (context) =>
+          QuickSnapUpdateDialog(updateConfig: config, isMandatory: isMandatory),
     );
 
     _dialogShown = false;

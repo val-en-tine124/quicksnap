@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:quicksnap/features/settings/ui.dart';
 
 void main() {
-  testWidgets("This is a test for settings UI", (WidgetTester tester) async {
+  testWidgets('This is a test for settings UI', (WidgetTester tester) async {
     await tester.pumpWidget(const ProviderScope(child: MaterialApp(home: SettingsUI())));
     await tester.pump();
     expect(find.byType(ListView), findsOneWidget);

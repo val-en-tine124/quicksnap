@@ -309,7 +309,7 @@ void main() {
 
       expect(dialogResult, true);
     });
-    testWidgets("Show linear progress bar", (WidgetTester tester) async {
+    testWidgets('Show linear progress bar', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
           child: MaterialApp(
@@ -321,7 +321,7 @@ void main() {
       );
 
       expect(find.byType(LinearProgressIndicator), findsOneWidget);
-      expect(find.text("Updating QuickSnap ..."), findsOneWidget);
+      expect(find.text('Updating QuickSnap ...'), findsOneWidget);
     });
   });
 

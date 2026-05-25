@@ -19,40 +19,41 @@ abstract class QuickSnapSettings with _$QuickSnapSettings {
     @Default(UserColorEnum.amber) UserColorEnum userColor,
   }) = _QuickSnapSettings;
 
-  static  QuickSnapSettings getDefault(){
+  static QuickSnapSettings getDefault() {
     return const QuickSnapSettings(
-        theme: ThemeMode.system,
-        autoFocus: true,
-        expands: true,
-        padding: 0,
-      );
+      theme: ThemeMode.system,
+      autoFocus: true,
+      expands: true,
+      padding: 0,
+    );
   }
-
 }
-extension EditorConfigFromSetting on QuickSnapSettings{
+
+extension EditorConfigFromSetting on QuickSnapSettings {
   QuillEditorConfig quillEditorConfig() {
     return QuillEditorConfig(
       autoFocus: autoFocus,
       expands: expands,
       padding: EdgeInsets.all(padding),
-      placeholder:"Type your text here." 
+      placeholder: 'Type your text here.',
     );
-}}
+  }
+}
 
+enum UserColorEnum { amber, blue, pink, green }
 
-enum UserColorEnum { amber, blue, pink,green }
-extension ToMaterialColor on UserColorEnum{
-  MaterialColor toMaterialColor(){
+extension ToMaterialColor on UserColorEnum {
+  MaterialColor toMaterialColor() {
     switch (name) {
-      case "amber":
+      case 'amber':
         return Colors.amber;
-      case "blue":
+      case 'blue':
         return Colors.blue;
-      case "pink":
+      case 'pink':
         return Colors.pink;
-      case "green":
+      case 'green':
         return Colors.green;
     }
-    throw Exception("Invalid Enum value.");
+    throw Exception('Invalid Enum value.');
   }
 }

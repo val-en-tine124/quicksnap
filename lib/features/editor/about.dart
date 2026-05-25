@@ -25,7 +25,7 @@ class AboutPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Center(child: Text("About QuickSnap")),
+        title: const Center(child: Text('About QuickSnap')),
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios_new_rounded,
@@ -49,7 +49,7 @@ class AboutPage extends StatelessWidget {
                 GlassBox(),
                 SizedBox(height: 20.0),
                 AdditionalSupportInfo(),
-                SizedBox(height: 10.0,),
+                SizedBox(height: 10.0),
                 SupportButton(),
                 SizedBox(height: 50.0),
                 AppVersionInfo(),
@@ -85,6 +85,7 @@ class AppVersionInfo extends StatelessWidget {
     );
   }
 }
+
 class AdditionalSupportInfo extends StatelessWidget {
   const AdditionalSupportInfo({super.key});
 
@@ -93,21 +94,22 @@ class AdditionalSupportInfo extends StatelessWidget {
     return const Wrap(
       children: [
         Text(
-          "A tip will keep the product improving ",
+          'A tip will keep the product improving ',
           style: TextStyle(
             fontSize: 16,
-            fontFamily: "Gilroy",
+            fontFamily: 'Gilroy',
             fontStyle: FontStyle.italic,
             fontWeight: .w300,
             color: kSecondaryTextColor,
           ),
         ),
 
-        GentleRotatingQ(rotatingObject: "👇", size: 40.0),
+        GentleRotatingQ(rotatingObject: '👇', size: 40.0),
       ],
     );
   }
 }
+
 class SupportButton extends StatelessWidget {
   const SupportButton({super.key});
 
@@ -121,9 +123,9 @@ class SupportButton extends StatelessWidget {
         );
       },
       label: const Text(
-        "Support",
+        'Support',
         style: TextStyle(
-          fontFamily: "Unageo",
+          fontFamily: 'Unageo',
           fontWeight: .w400,
           fontSize: 17,
           color: kSecondaryTextColor,
@@ -202,7 +204,7 @@ class _ParticleBackgroundState extends State<ParticleBackground>
         final now = DateTime.now().millisecondsSinceEpoch / 1000.0;
         final dt = (now - _lastTickSeconds).clamp(0.0, 0.05);
         _lastTickSeconds = now;
-    
+
         for (var p in _particles) {
           // decrease lifespan by real time
           p.lifespan -= dt;
@@ -211,7 +213,7 @@ class _ParticleBackgroundState extends State<ParticleBackground>
             p.position.dx + p.velocity.dx * dt,
             p.position.dy + p.velocity.dy * dt,
           );
-    
+
           // when particle dies, respawn at bottom with new random life/velocity
           if (p.lifespan <= 0) {
             p.position = Offset(
@@ -226,7 +228,7 @@ class _ParticleBackgroundState extends State<ParticleBackground>
               -(_random.nextDouble() * 0.02 + 0.002),
             );
           }
-    
+
           // wrap horizontally
           if (p.position.dx < -0.1) p.position = Offset(1.1, p.position.dy);
           if (p.position.dx > 1.1) p.position = Offset(-0.1, p.position.dy);
@@ -249,38 +251,67 @@ class _ParticleBackgroundState extends State<ParticleBackground>
 
 class ParticlePainter extends CustomPainter {
   final List<Particle> particles;
+
+  // Cache to prevent re-allocating background shader every frame
+  Size? _lastSize;
+  late Paint _bgPaint;
+  final Paint _particlePaint = Paint();
+
   ParticlePainter(this.particles);
+
   @override
   void paint(Canvas canvas, Size size) {
-    final rect = Rect.fromCircle(
-      center: size.center(Offset.zero),
-      radius: size.width * 0.9,
-    );
-    final bgPaint = Paint()
-      // Use a deeper radial tint with slightly higher opacity so edges stay dark
-      ..shader = RadialGradient(
-        colors: [
-          const Color(0xFF2A1726).withValues(alpha: 0.6),
-          kBackgroundColor.withValues(alpha: 0),
-        ],
-      ).createShader(rect);
-    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), bgPaint);
+    // Only re-compile the background shader if the window size changes
+    if (_lastSize != size) {
+      _lastSize = size;
+      final rect = Rect.fromCircle(
+        center: size.center(Offset.zero),
+        radius: size.width * 0.9,
+      );
+      _bgPaint = Paint()
+        ..shader = RadialGradient(
+          colors: [
+            const Color(0xFF2A1726).withValues(alpha: 0.6),
+            Colors.transparent, // Replaced kBackgroundColor for the snippet
+          ],
+        ).createShader(rect);
+    }
 
-    final paint = Paint();
+    // Draw background
+    canvas.drawRect(Offset.zero & size, _bgPaint);
+
     for (var p in particles) {
       final progress = 1.0 - (p.lifespan / p.maxLifespan);
       final opacity = max(0.0, -4 * (progress - 0.5) * (progress - 0.5) + 1);
+      final particleColor = Colors.white.withValues(alpha: opacity * 0.35);
 
-      // Lower particle brightness so they don't wash out the dark background
-      paint.color = Colors.white.withValues(alpha: opacity * 0.35);
-      paint.maskFilter = p.isSharp
-          ? null
-          : MaskFilter.blur(BlurStyle.normal, p.radius * 2);
+      if (p.isSharp) {
+        _particlePaint.color = particleColor;
+        _particlePaint.shader = null;
+      } else {
+        // "Fake Blur": Infinitely faster than MaskFilter.blur
+        _particlePaint.color = Colors.white; // Color handled by gradient
+        _particlePaint.shader =
+            RadialGradient(
+              colors: [particleColor, particleColor.withValues(alpha: 0.0)],
+              stops: const [0.1, 1.0],
+            ).createShader(
+              Rect.fromCircle(
+                center: Offset(
+                  p.position.dx * size.width,
+                  p.position.dy * size.height,
+                ),
+                radius:
+                    p.radius *
+                    3, // Make radius slightly larger to accommodate the fade
+              ),
+            );
+      }
 
       canvas.drawCircle(
         Offset(p.position.dx * size.width, p.position.dy * size.height),
-        p.radius,
-        paint,
+        p.isSharp ? p.radius : p.radius * 3,
+        _particlePaint,
       );
     }
   }
@@ -359,7 +390,7 @@ class _AuthorInfoState extends State<AuthorInfo> {
     color = ValueNotifier(Colors.blue);
     randgen = Random();
     timer = Timer.periodic(const Duration(seconds: 1), (t) {
-      List<Color> colorList = [
+      final List<Color> colorList = [
         Colors.red,
         Colors.orange,
         Colors.yellow,
@@ -393,21 +424,20 @@ class _AuthorInfoState extends State<AuthorInfo> {
               child: ValueListenableBuilder(
                 valueListenable: color,
                 builder: (context, value, child) {
-                  return Center(
-                    child: SelectableText(
-                      "QuickSnap",
-                      style: TextStyle(
-                        color: color.value,
-                        fontWeight: .w400,
-                        fontFamily: "Unageo",
-                        fontSize: 28,
-                      ),
-                    ),
-                  );
+                  return Center(child: child);
                 },
+                child: SelectableText(
+                  'QuickSnap',
+                  style: TextStyle(
+                    color: color.value,
+                    fontWeight: .w400,
+                    fontFamily: 'Unageo',
+                    fontSize: 28,
+                  ),
+                ),
               ),
             ),
-            const GentleRotatingQ(rotatingObject: "❤️",),
+            const GentleRotatingQ(rotatingObject: '❤️'),
           ],
         ),
         const Wrap(
@@ -416,12 +446,12 @@ class _AuthorInfoState extends State<AuthorInfo> {
 
           children: [
             Padding(
-              padding: EdgeInsets.only(bottom:8.0),
+              padding: EdgeInsets.only(bottom: 8.0),
               child: Text(
-                "A compact cross-platform text editor app.",
+                'A compact cross-platform text editor app.',
                 style: TextStyle(
                   fontSize: 15,
-                  fontFamily: "Gilroy",
+                  fontFamily: 'Gilroy',
                   fontStyle: FontStyle.italic,
                   color: kSecondaryTextColor,
                 ),
@@ -430,19 +460,19 @@ class _AuthorInfoState extends State<AuthorInfo> {
             Row(
               children: [
                 Text(
-                  "Coded by:",
+                  'Coded by:',
                   style: TextStyle(
                     fontSize: 14,
-                    fontFamily: "Gilroy",
+                    fontFamily: 'Gilroy',
                     fontStyle: FontStyle.italic,
                     color: kSecondaryTextColor,
                   ),
                 ),
                 SelectableText(
-                  "   Abba Valentine Chibueze.",
+                  '   Abba Valentine Chibueze.',
                   style: TextStyle(
                     fontSize: 16,
-                    fontFamily: "Gilroy",
+                    fontFamily: 'Gilroy',
                     fontStyle: FontStyle.normal,
                     fontWeight: .w400,
                     color: kSecondaryTextColor,
@@ -464,20 +494,23 @@ class _AuthorInfoState extends State<AuthorInfo> {
             _InfoPill(
               icon: FontAwesome.github_brand,
               text: 'Maintainer',
-              tooltip: "Follow him on Github",
-              onTap: () => launchExternalLink('https://github.com/val-en-tine124')
+              tooltip: 'Follow him on Github',
+              onTap: () =>
+                  launchExternalLink('https://github.com/val-en-tine124'),
             ),
             _InfoPill(
               icon: FontAwesome.linkedin_brand,
               text: 'Linkedln',
-              tooltip: "Check him out on Linkedln",
-              onTap: () => launchExternalLink('https://linkedin.com/in/valentine-abba-885b8139b')
+              tooltip: 'Check him out on Linkedln',
+              onTap: () => launchExternalLink(
+                'https://linkedin.com/in/valentine-abba-885b8139b',
+              ),
             ),
             _InfoPill(
               icon: FontAwesome.telegram_brand,
               text: 'Telegram',
-              tooltip: "Check him out on telegram",
-              onTap: () =>launchExternalLink('https://t.me/val_400')
+              tooltip: 'Check him out on telegram',
+              onTap: () => launchExternalLink('https://t.me/val_400'),
             ),
 
             // Short label 'Email' opens mail composer
@@ -485,10 +518,10 @@ class _AuthorInfoState extends State<AuthorInfo> {
         ),
         const Spacer(),
         const Text(
-          "Enjoying QuickSnap ?",
+          'Enjoying QuickSnap ?',
           style: TextStyle(
             fontSize: 16,
-            fontFamily: "Gilroy",
+            fontFamily: 'Gilroy',
             fontStyle: FontStyle.normal,
             fontWeight: .w300,
             color: kSecondaryTextColor,
@@ -551,7 +584,11 @@ class _InfoPill extends StatelessWidget {
 class GentleRotatingQ extends StatefulWidget {
   final double size;
   final String rotatingObject;
-  const GentleRotatingQ({this.size = 28,required this.rotatingObject, super.key});
+  const GentleRotatingQ({
+    this.size = 28,
+    required this.rotatingObject,
+    super.key,
+  });
 
   @override
   State<GentleRotatingQ> createState() => _GentleRotatingQState();
@@ -581,20 +618,23 @@ class _GentleRotatingQState extends State<GentleRotatingQ>
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _controller,
+      // 1. Instantiate the text once
+      child: Text(
+        widget.rotatingObject,
+        style: const TextStyle(fontSize: 15.0),
+      ),
       builder: (context, child) {
-        final t = _controller.value; // 0..1
-        // Sinusoidal rotation: small angle in radians (~ +/-9 deg)
+        final t = _controller.value;
         final angle = sin(t * 2 * pi) * (pi / 20);
-        // Slight 'breathing' scale for softness
         final scale = 1 + 0.03 * sin(t * 2 * pi);
-        // Gentle horizontal sway in logical pixels
         final dx = 2.0 * sin(t * 2 * pi);
-    
+
         return Transform.translate(
           offset: Offset(dx, 0),
           child: Transform.rotate(
             angle: angle,
-            child: Transform.scale(scale: scale, child: Text(widget.rotatingObject,style:const TextStyle(fontSize: 15.0))),
+            // 2. Consume the cached text reference
+            child: Transform.scale(scale: scale, child: child),
           ),
         );
       },
@@ -606,8 +646,11 @@ Future<void> launchExternalLink(String url) async {
   final uri = Uri.parse(url);
   if (!await launcher.canLaunchUrl(uri)) {
     // Handle case where the device/app cannot open the link
-    dev.log('Could not launch $url',level: 1000,);
+    dev.log('Could not launch $url', level: 1000);
   } else {
-    await launcher.launchUrl(uri, mode: launcher.LaunchMode.externalApplication);
+    await launcher.launchUrl(
+      uri,
+      mode: launcher.LaunchMode.externalApplication,
+    );
   }
 }

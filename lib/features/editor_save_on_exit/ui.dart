@@ -100,7 +100,7 @@ class _SaveOnExitDialogState extends ConsumerState<_SaveOnExitDialog> {
       if (mounted) {
         setState(() {
           _isSaving = false;
-          _errorMessage = "An unexpected error occurred";
+          _errorMessage = 'An unexpected error occurred';
         });
       }
     }
@@ -109,7 +109,7 @@ class _SaveOnExitDialogState extends ConsumerState<_SaveOnExitDialog> {
   void _handleDiscard() {
     if (!mounted) return;
     if (Navigator.canPop(context)) {
-    Navigator.pop(context, true);
+      Navigator.pop(context, true);
     }
   }
 
@@ -123,18 +123,18 @@ class _SaveOnExitDialogState extends ConsumerState<_SaveOnExitDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text("Unsaved changes"),
+      title: const Text('Unsaved changes'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            "You have unsaved changes. Do you wish to save your changes?",
+            'You have unsaved changes. Do you wish to save your changes?',
           ),
           if (_errorMessage != null) ...[
             const SizedBox(height: 12),
             Text(
-              "Save failed: $_errorMessage",
+              'Save failed: $_errorMessage',
               style: TextStyle(
                 color: Theme.of(context).colorScheme.error,
                 fontSize: 14,
@@ -142,7 +142,7 @@ class _SaveOnExitDialogState extends ConsumerState<_SaveOnExitDialog> {
             ),
             const SizedBox(height: 8),
             const Text(
-              "You can still discard your changes or cancel.",
+              'You can still discard your changes or cancel.',
               style: TextStyle(fontSize: 14),
             ),
           ],
@@ -159,14 +159,14 @@ class _SaveOnExitDialogState extends ConsumerState<_SaveOnExitDialog> {
             ),
           )
         else
-          TextButton(onPressed: _handleSave, child: const Text("Save")),
+          TextButton(onPressed: _handleSave, child: const Text('Save')),
         TextButton(
           onPressed: _isSaving ? null : _handleDiscard,
-          child: const Text("Discard"),
+          child: const Text('Discard'),
         ),
         TextButton(
           onPressed: _isSaving ? null : _handleCancel,
-          child: const Text("Cancel"),
+          child: const Text('Cancel'),
         ),
       ],
     );

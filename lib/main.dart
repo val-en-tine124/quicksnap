@@ -1,21 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:quicksnap/features/app_update/ui.dart';
 import 'package:quicksnap/features/editor_save_on_exit/ui.dart';
-import 'package:quicksnap/styling/theme_data.dart';
 import 'package:quicksnap/features/settings/hive_registrar.g.dart';
 import 'package:quicksnap/features/settings/models.dart';
-import 'features/editor/ui.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_quill/flutter_quill.dart';
+import 'package:quicksnap/styling/theme_data.dart';
+
 import './features/settings/providers.dart';
+import 'features/editor/ui.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter("quicksnap_data");
+  await Hive.initFlutter('quicksnap_data');
   Hive.registerAdapters();
-  final settingsBox = await Hive.openBox<QuickSnapSettings>("QuickSnapSettings");
-  await Hive.openBox("UpdateConfig");
+  final settingsBox = await Hive.openBox<QuickSnapSettings>(
+    'QuickSnapSettings',
+  );
+  await Hive.openBox('UpdateConfig');
 
   runApp(
     ProviderScope(
@@ -46,7 +50,7 @@ class QuickSnapApp extends ConsumerWidget {
       supportedLocales: const [Locale('en')],
 
       home: const UpdateChecker(
-        child: SaveOnExit(editorScaffold: EditorScaffold(),),
+        child: SaveOnExit(editorScaffold: EditorScaffold()),
       ),
     );
   }

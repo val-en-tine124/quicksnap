@@ -1,14 +1,15 @@
 import 'dart:developer';
 import 'dart:io';
+
+import 'package:android_intent_plus/android_intent.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:android_intent_plus/android_intent.dart';
 
 /// Utility class for handling in-app updates.
-/// 
+///
 /// This class provides functionality to:
 /// - Download APK files to a secure temporary directory
 /// - Display download progress via Android notification
@@ -23,7 +24,7 @@ class AppUpdateUtils {
 
   /// The notification channel ID for download progress
   static const String _channelId = 'com.quicksnap.app_update';
-  
+
   /// The notification channel name
   static const String _channelName = 'App Updates';
 
@@ -34,16 +35,18 @@ class AppUpdateUtils {
   static const String _apkFileName = 'quicksnap_update.apk';
 
   /// Initializes the notification plugin for Android.
-  /// 
+  ///
   /// This should be called before showing any notifications.
   static Future<void> _initNotifications() async {
     if (_notificationsInitialized) return;
 
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
     const initSettings = InitializationSettings(android: androidSettings);
-    
-    await _notificationsPlugin.initialize(settings:initSettings);
-    
+
+    await _notificationsPlugin.initialize(settings: initSettings);
+
     // Create the notification channel for Android 8.0+
     const androidChannel = AndroidNotificationChannel(
       _channelId,
@@ -57,14 +60,15 @@ class AppUpdateUtils {
 
     await _notificationsPlugin
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(androidChannel);
 
     _notificationsInitialized = true;
   }
 
   /// Requests the necessary permissions for installing packages.
-  /// 
+  ///
   /// Returns true if the permission was granted, false otherwise.
   static Future<bool> requestInstallPermission() async {
     if (!Platform.isAndroid) return true;
@@ -79,13 +83,13 @@ class AppUpdateUtils {
     // Check if we can request install packages (this opens a system settings screen)
     // Note: REQUEST_INSTALL_PACKAGES cannot be directly requested via permission_handler
     // The user must manually enable it in settings, but we can check if it's enabled
-    return await _canRequestPackageInstallation();
+    return _canRequestPackageInstallation();
   }
 
   /// Checks if the app can request package installation.
   static Future<bool> _canRequestPackageInstallation() async {
     if (!Platform.isAndroid) return true;
-    
+
     // On Android, we check if the intent to install packages can be launched
     try {
       // This is a simple check - the actual permission is granted at install time
@@ -96,15 +100,15 @@ class AppUpdateUtils {
   }
 
   /// Downloads an APK file from the given URL and returns the file path.
-  /// 
+  ///
   /// This method:
   /// - Downloads the APK to the app's temporary directory
   /// - Shows a notification with download progress (throttled to percentage changes)
   /// - Returns the path to the downloaded file when complete
-  /// 
+  ///
   /// [downloadUrl] The URL to download the APK from
   /// [onProgress] Optional callback for progress updates (0.0 to 1.0)
-  /// 
+  ///
   /// Returns the [File] path to the downloaded APK.
   static Future<File> downloadApk({
     required String downloadUrl,
@@ -123,7 +127,7 @@ class AppUpdateUtils {
     final file = File(filePath);
 
     // Delete the file if it already exists
-    if (await file.exists()) {
+    if (file.existsSync()) {
       await file.delete();
     }
 
@@ -138,7 +142,7 @@ class AppUpdateUtils {
           if (total <= 0) return;
 
           final progress = received / total;
-          
+
           // Calculate the integer percentage
           final percentage = (progress * 100).toInt();
 
@@ -192,15 +196,15 @@ class AppUpdateUtils {
     // Note: Flutter local notifications doesn't support updating progress directly,
     // so we show a new notification each time the percentage changes
     await _notificationsPlugin.show(
-      id:_notificationId,
-      title:'Downloading update...',
+      id: _notificationId,
+      title: 'Downloading update...',
       body: '$percentage% complete',
-      notificationDetails:androidDetails,
+      notificationDetails: androidDetails,
     );
   }
 
   /// Triggers the Android package installer to install the APK file.
-  /// 
+  ///
   /// [apkFile] The [File] object pointing to the downloaded APK.
   static Future<void> installApk(File apkFile) async {
     if (!Platform.isAndroid) {
@@ -233,17 +237,26 @@ class AppUpdateUtils {
           0x00000001, // FLAG_GRANT_READ_URI_PERMISSION
         ],
       );
-      log("Preparing to launch android intent for installation of update at:${apkFile.path}",name: "installApk",level: 800);
+      log(
+        'Preparing to launch android intent for installation of update at:${apkFile.path}',
+        name: 'installApk',
+        level: 800,
+      );
       await intent.launch();
     } catch (e) {
-      log("Failed to launch android intent for installation of update at:${apkFile.path}\nconsider falling back to open_file approach",name: "installApk",error:e ,level: 1000);
+      log(
+        'Failed to launch android intent for installation of update at:${apkFile.path}\nconsider falling back to open_file approach',
+        name: 'installApk',
+        error: e,
+        level: 1000,
+      );
       throw Exception('Failed to launch package installer: $e');
     }
   }
 
   /// Cancels the download progress notification.
   static Future<void> cancelNotification() async {
-    await _notificationsPlugin.cancel(id:_notificationId);
+    await _notificationsPlugin.cancel(id: _notificationId);
   }
 }
 

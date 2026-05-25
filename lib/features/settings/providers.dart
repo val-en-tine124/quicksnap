@@ -6,7 +6,11 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import './models.dart';
 
 @GenerateAdapters(
-  [AdapterSpec<QuickSnapSettings>(), AdapterSpec<ThemeMode>(),AdapterSpec<UserColorEnum>()],
+  [
+    AdapterSpec<QuickSnapSettings>(),
+    AdapterSpec<ThemeMode>(),
+    AdapterSpec<UserColorEnum>(),
+  ],
 ) // DO this to make QuickSnapSettings Hive compatible(i.e serialiazable and deserializable), and generate the adapter using build_runner
 part 'providers.g.dart';
 
@@ -33,7 +37,7 @@ class SettingsState extends _$SettingsState {
     final stateValue = stateTemp.value!;
     final box = ref.read(settingsInHiveProvider);
     state = const AsyncLoading();
-    box.put("settings", stateValue);
+    box.put('settings', stateValue);
     state = AsyncData(stateValue);
   }
 

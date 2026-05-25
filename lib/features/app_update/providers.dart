@@ -1,8 +1,9 @@
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:dio/dio.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:dio/dio.dart';
-import 'package:device_info_plus/device_info_plus.dart';
+
 import 'models.dart';
 import 'utils.dart';
 
@@ -12,21 +13,23 @@ part 'providers.g.dart';
 class UpdateConfigCache extends _$UpdateConfigCache {
   @override
   Future<UpdateConfig?> build() async {
-    if (!ref.mounted)return null;
-    state = AsyncValue.data(await _loadFromHive());   // This cache provider can be used to store the last fetched update config
+    if (!ref.mounted) return null;
+    state = AsyncValue.data(
+      await _loadFromHive(),
+    ); // This cache provider can be used to store the last fetched update config
     // and return it when the network is unavailable.
-     // Initially, there is no cached config.
-     return state.value;
+    // Initially, there is no cached config.
+    return state.value;
   }
 
   Future<void> saveToHive(UpdateConfig updateConfig) async {
-    final box = await Hive.openBox<UpdateConfig>("UpdateConfig");
-    await box.put("updateConfig", updateConfig);
+    final box = await Hive.openBox<UpdateConfig>('UpdateConfig');
+    await box.put('updateConfig', updateConfig);
   }
 
   Future<UpdateConfig?> _loadFromHive() async {
-    final box = await Hive.openBox<UpdateConfig>("UpdateConfig");
-    return box.get("updateConfig");
+    final box = await Hive.openBox<UpdateConfig>('UpdateConfig');
+    return box.get('updateConfig');
   }
 }
 
@@ -128,8 +131,8 @@ class UpdateDownloadState extends _$UpdateDownloadState {
   @override
   AsyncValue<void> build() {
     // Cancel any pending work when the provider is disposed
-    ref.onDispose(() {
-      AppUpdateUtils.cancelNotification();
+    ref.onDispose(() async {
+      await AppUpdateUtils.cancelNotification();
     });
     return const AsyncData(null);
   }
@@ -218,11 +221,11 @@ enum DeviceArch {
 }
 
 Future<DeviceArch> checkArchitecture() async {
-  DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-  AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+  final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
 
   // supportedAbis returns a list of ABIs supported by the device in order of preference
-  List<String?> abis = androidInfo.supportedAbis;
+  final List<String?> abis = androidInfo.supportedAbis;
   if (abis.contains('arm64-v8a')) {
     return DeviceArch.Armeabiv8a;
   }

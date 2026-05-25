@@ -21,14 +21,52 @@ linter:
   # `// ignore_for_file: name_of_lint` syntax on the line or in the file
   # producing the lint.
   rules:
-    # avoid_print: false  # Uncomment to disable the `avoid_print` rule
-    # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
-    - use_super_parameters
-    - close_sinks
-    - prefer_const_constructors
-    - prefer_const_declarations
+    # --- Framework Safety & Memory Leak Prevention ---
+
+    - use_build_context_synchronously # Crucial: Warns you if you use a BuildContext after an 'await' async gap; Crucial: Stops you from using BuildContext across async gaps (prevents crashes)
+    - unnecessary_await_in_return    # Keeps async code clean and performant
+    - cancel_subscriptions           # Catches Stream subscriptions that aren't closed (prevents memory leaks)
+    - close_sinks                     # Ensures Sinks/StreamControllers are properly closed;Ensures Stream subscriptions aren't left dangling
+    
+    
+    
+    # --- PRODUCTIVITY & CLEANLINESS, Performance Optimization ---
+    # --- The Rustacean's Auto-Formatting Peace of Mind ---
+    - prefer_single_quotes # Enforces single quotes. Pair this with IDE 'Format on Save' to auto-convert " to '
+    - prefer_const_constructors      # Forces you to use 'const' widgets to optimize Flutter's render tree;Essential for Flutter performance (avoids rebuilding static widgets)
+    - prefer_const_declarations     # Like using 'const' instead of 'let' in other languages
+    #- unawaited_futures             # Forces you to handle or explicitly ignore async Operations
     - prefer_const_constructors_in_immutables
     - prefer_final_fields
+  
+    # --- CODE STYLE ---
+    - combinators_ordering           # Automatically sorts your 'show' and 'hide' statements
+    - directives_ordering            # Automatically organizes your import statements alphabetically
+
+    # --- Clean & Maintainable Code ---
+    - always_declare_return_types # No implicit 'dynamic' return types
+    - prefer_final_locals         # Forces 'final' on variables that don't mutate (highly recommended for Rust devs!)
+    - avoid_print           # Warns you if you leave raw print statements in production code;Flags print() statements, forces you to use debugPrint() or log() instead          
+
+        # --- The Rustacean's Auto-Formatting Peace of Mind ---
+    # --- Framework Safety & Memory Leak Prevention ---
+
+    # --- Performance Optimization ---
+
+    # --- Clean & Maintainable Code ---
+
+    # --- CODE STYLE ---
+
+    # Structure & Maintenance
+    - lines_longer_than_80_chars  # Optional: enforces line breaks to prevent wide, messy widget horizontal trees
+    - curly_braces_in_flow_control_structures
+
+    # Memory Leak Guards
+
+    # Async/Performance Integrity
+    - avoid_slow_async_io
+    - discarded_futures # Warns if a future is invoked but its outcome is completely ignored/unhandled
+
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
@@ -40,3 +78,20 @@ analyzer:
     - '**/*.freezed.dart'
     - "lib/**/*.g.dart"
     - "lib/**/*.freezed.dart"
+
+    # Enforce strict type rules (Similar to Rust's type rigidity)
+  language:
+    strict-casts: true       # Prevents the analyzer from implicitly casting 'dynamic' types
+    strict-inference: true   # Forces you to specify types when the compiler can't easily guess it
+    strict-raw-types: true   # Disallows using generic types without specifying the type argument (e.g., List instead of List<int>)
+
+  
+  errors:
+    # Upgrade specific annoying warnings into compilation-blocking errors
+    missing_required_param: error
+    missing_return: error
+    todo: warning # remember to keep your terminal clean of TODO notes during active dev
+
+formatter:
+  page_width: 80
+  trailing_commas: automate

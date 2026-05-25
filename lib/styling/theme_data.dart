@@ -14,7 +14,7 @@ class AppThemeData {
       snackBarTheme: const SnackBarThemeData(
         elevation: 7.0,
         behavior: .floating,
-        insetPadding: .symmetric(vertical: 10.0,horizontal: 10.0)
+        insetPadding: .symmetric(vertical: 10.0, horizontal: 10.0),
       ),
       textTheme: _buildTextTheme(),
       cardTheme: CardThemeData(
@@ -70,12 +70,12 @@ class AppThemeData {
         height: 1.5,
       ),
       titleMedium: TextStyle(
-        fontFamily: "ReThink-Sans",
+        fontFamily: 'ReThink-Sans',
         fontSize: 14.0,
         fontWeight: FontWeight.w400,
       ),
       titleLarge: TextStyle(
-        fontFamily: "CodePro",
+        fontFamily: 'CodePro',
         fontSize: 24.0,
         fontWeight: FontWeight.w400,
       ),

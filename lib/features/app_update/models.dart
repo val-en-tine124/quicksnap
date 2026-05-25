@@ -3,21 +3,22 @@ import 'package:hive_ce_flutter/hive_flutter.dart';
 part 'models.g.dart';
 
 /// Represents the remote version configuration for app updates.
-/// 
+///
 /// This model is used to parse the JSON response from the update server
 /// and determine if an update is available.
 class UpdateConfig {
   /// The latest version string (e.g., "1.0.1")
   final String latestVersion;
-  
+
   /// The URL to download the armeabi_v8a APK file from
   final String downloadUrlV8a;
+
   /// The URL to download the armeabi_v7a APK file from
   final String downloadUrlV7a;
-  
+
   /// Whether this update is mandatory (user cannot skip it)
   final bool isMandatory;
-  
+
   /// Optional: Release notes or description of changes
   final String? releaseNotes;
 

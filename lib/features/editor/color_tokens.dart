@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 abstract class ColorTokens {
   // Brand palette
-  static const blue50  = Color(0xFFE8F0FE);
+  static const blue50 = Color(0xFFE8F0FE);
   static const blue600 = Color(0xFF1A73E8);
   static const blue700 = Color(0xFF1557B0);
 
@@ -12,6 +12,6 @@ abstract class ColorTokens {
   static const red500 = Color(0xFFEA4335);
 
   // Neutrals
-  static const grey50  = Color(0xFFF8F9FA);
+  static const grey50 = Color(0xFFF8F9FA);
   static const grey900 = Color(0xFF202124);
 }

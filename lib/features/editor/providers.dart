@@ -1,23 +1,25 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_quill/flutter_quill.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 import 'package:file_picker/file_picker.dart';
-import 'package:quicksnap/features/editor_save_on_exit/providers.dart';
+import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quicksnap/features/editor/utils/file_utils.dart';
-part "providers.g.dart";
+import 'package:quicksnap/features/editor_save_on_exit/providers.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'providers.g.dart';
 
 @riverpod
 class AppBarTitle extends _$AppBarTitle {
   @override
   String build() {
     final fileData = ref.watch(filePickerProvider);
-    var appBarTitle = fileData.value?.name ?? "Untitled Document";
+    var appBarTitle = fileData.value?.name ?? 'Untitled Document';
     final isEdited = ref.watch(isEditedProvider);
     if (isEdited) {
-      appBarTitle += " *";
+      appBarTitle += ' *';
     }
     return appBarTitle;
   }
@@ -50,7 +52,7 @@ class FilePickerNotifier extends AsyncNotifier<PlatformFile?> {
     state = const AsyncLoading();
     try {
       final result = await FilePicker.platform.pickFiles(
-        dialogTitle: "Select a QuickSnap text file",
+        dialogTitle: 'Select a QuickSnap text file',
         type: FileType.custom,
         allowedExtensions: ['txt', 'log'],
       );
@@ -112,8 +114,8 @@ class FilePickerNotifier extends AsyncNotifier<PlatformFile?> {
         // "Save As" a new file
         final newPath = await FilePicker.platform.saveFile(
           type: FileType.custom,
-          fileName: "untitled.txt",
-          allowedExtensions: ["txt",],
+          fileName: 'untitled.txt',
+          allowedExtensions: ['txt'],
           bytes: utf8.encode(documentAsText),
         );
 

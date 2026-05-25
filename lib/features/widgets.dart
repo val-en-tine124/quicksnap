@@ -1,8 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:quicksnap/features/settings/models.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:quicksnap/features/settings/models.dart';
 
 ///Creates an horizontal array of circular colored widget.
 
@@ -42,7 +42,7 @@ class CircularColorButton extends State<ColorButtonTray> {
         Padding(
           padding: const EdgeInsets.all(12.0),
           child: Text(
-            "Select A Color Style",
+            'Select A Color Style',
             style: Theme.of(context).textTheme.titleMedium,
           ),
         ),
@@ -51,7 +51,7 @@ class CircularColorButton extends State<ColorButtonTray> {
   }
 
   Widget _singleColorPicker(UserColorEnum color) {
-    bool isSelected = widget.value == color;
+    final bool isSelected = widget.value == color;
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -166,7 +166,7 @@ class ImageCardButton extends StatelessWidget {
         style: TextStyle(
           backgroundColor: textBgColor,
           color: textFgColor,
-          fontFamily: "CodePro",
+          fontFamily: 'CodePro',
           fontStyle: .italic,
           fontSize: textSize,
         ),
@@ -258,7 +258,7 @@ class _RainBowTextState extends State<RainBowText>
                 end: .bottomRight,
                 colors: _rainbowColors,
                 tileMode: .mirror,
-                transform: GradientRotation(controller.value * 2 * pi ),
+                transform: GradientRotation(controller.value * 2 * pi),
               ).createShader(Offset.zero & bounds.size);
             },
             child: child,

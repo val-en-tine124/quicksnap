@@ -31,7 +31,7 @@ class EditorScaffold extends ConsumerWidget {
     // Show error snackbar when file picker encounters an error
     if (fileState.hasError) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        customScaffoldMessenger(context, Text("Error: ${fileState.error}"));
+        customScaffoldMessenger(context, Text('Error: ${fileState.error}'));
       });
     }
 
@@ -40,7 +40,7 @@ class EditorScaffold extends ConsumerWidget {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         customScaffoldMessenger(
           context,
-          Text("Settings Error: ${settingsState.error}"),
+          Text('Settings Error: ${settingsState.error}'),
         );
       });
     }
@@ -50,17 +50,19 @@ class EditorScaffold extends ConsumerWidget {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         customScaffoldMessenger(
           context,
-          Text("Content Error: ${editorInitialContentState.error}"),
+          Text('Content Error: ${editorInitialContentState.error}'),
         );
       });
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Center(child: Text(fileTitle, style: const TextStyle(fontSize: 16))),
+        title: Center(
+          child: Text(fileTitle, style: const TextStyle(fontSize: 16)),
+        ),
         actions: [
           IconButton(
-            tooltip: "Settings",
+            tooltip: 'Settings',
             onPressed: () {
               if (context.mounted) {
                 Navigator.push(
@@ -139,7 +141,7 @@ class _Editor extends ConsumerWidget {
             _EditorToolBar(controller),
           ],
         ),
-        if (fileState.isLoading) Center(child: _showSpinner("Loading ...")),
+        if (fileState.isLoading) Center(child: _showSpinner('Loading ...')),
       ],
     );
   }
@@ -174,7 +176,7 @@ class AboutSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.info),
-      title: const Text("About"),
+      title: const Text('About'),
       trailing: const Icon(Icons.arrow_forward_ios),
       onTap: () {
         if (context.mounted) {
@@ -210,7 +212,7 @@ class DrawerFsOps extends ConsumerWidget {
                 Navigator.pop(context);
               },
         leading: const Icon(Icons.add),
-        title: const Text("New File"),
+        title: const Text('New File'),
         trailing: const Icon(Icons.arrow_forward_ios),
         enabled: !isLoading,
       ),
@@ -224,12 +226,12 @@ class DrawerFsOps extends ConsumerWidget {
                 if (fileState.hasValue) {
                   customScaffoldMessenger(
                     context,
-                    const Text("File saved successfully"),
+                    const Text('File saved successfully'),
                   );
                 }
               },
         leading: const Icon(Icons.save),
-        title: const Text("Save File"),
+        title: const Text('Save File'),
         trailing: const Icon(Icons.arrow_forward_ios),
         enabled: !isLoading,
       ),
@@ -251,7 +253,7 @@ class DrawerFsOps extends ConsumerWidget {
                 }
               },
         leading: const Icon(Icons.folder_open),
-        title: const Text("Open File"),
+        title: const Text('Open File'),
         trailing: const Icon(Icons.arrow_forward_ios),
         enabled: !isLoading,
       ),
