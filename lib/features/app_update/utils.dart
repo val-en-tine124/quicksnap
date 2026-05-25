@@ -166,13 +166,14 @@ class AppUpdateUtils {
       }
 
       return file;
-    } catch (e) {
+    } on Exception catch (_) {
       // Clean up on failure
-      if (await file.exists()) {
-        await file.delete();
+      if (file.existsSync()) {
+        file.deleteSync();
       }
-      rethrow;
+        rethrow;
     }
+    
   }
 
   /// Shows or updates the download progress notification.
@@ -211,7 +212,7 @@ class AppUpdateUtils {
       throw UnsupportedError('APK installation is only supported on Android');
     }
 
-    if (!await apkFile.exists()) {
+    if (!apkFile.existsSync()) {
       throw FileNotFoundException('APK file not found: ${apkFile.path}');
     }
 

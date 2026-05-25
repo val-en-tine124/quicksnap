@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:isolate';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -60,9 +59,7 @@ class FilePickerNotifier extends AsyncNotifier<PlatformFile?> {
       if (result != null && result.files.isNotEmpty) {
         //make sure the file picker picked a file.
         final firstFile = result.files.first;
-        final delta = await Isolate.run(
-          () => FileUtils.fileToDelta(File(firstFile.path!)),
-        );
+        final delta = await FileUtils.fileToDelta(File(firstFile.path!));
         final editorController = ref.read(quillControllerProvider)
           ..clear(); // clear quill controller state and
         //document it hold when opening a new file
@@ -107,7 +104,7 @@ class FilePickerNotifier extends AsyncNotifier<PlatformFile?> {
         final updatedFile = PlatformFile(
           name: fileToSave.name,
           path: fileToSave.path,
-          size: await file.length(),
+          size: file.lengthSync(),
         );
         state = AsyncData(updatedFile);
       } else {
@@ -124,7 +121,7 @@ class FilePickerNotifier extends AsyncNotifier<PlatformFile?> {
           final file = File(newPath);
           int fileSize = 0;
           try {
-            fileSize = await file.length();
+            fileSize = file.lengthSync();
           } catch (e) {
             state = AsyncError(e, StackTrace.current);
             return;
