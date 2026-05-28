@@ -384,13 +384,7 @@ class _AuthorInfoState extends State<AuthorInfo> {
   late ValueNotifier<Color> color;
   late Timer timer;
   late Random randgen;
-  @override
-  void initState() {
-    super.initState();
-    color = ValueNotifier(Colors.blue);
-    randgen = Random();
-    timer = Timer.periodic(const Duration(seconds: 1), (t) {
-      final List<Color> colorList = [
+ static const List<Color> colorList = [
         Colors.red,
         Colors.orange,
         Colors.yellow,
@@ -398,7 +392,13 @@ class _AuthorInfoState extends State<AuthorInfo> {
         Colors.blue,
         Colors.indigo,
         Colors.purple,
-      ];
+      ]; 
+  @override
+  void initState() {
+    super.initState();
+    color = ValueNotifier(Colors.blue);
+    randgen = Random();
+    timer = Timer.periodic(const Duration(seconds: 1), (t) {
       final nextInt = randgen.nextInt(7);
       color.value = colorList[nextInt];
     });
