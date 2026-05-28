@@ -19,7 +19,7 @@ void main() async {
   final settingsBox = await Hive.openBox<QuickSnapSettings>(
     'QuickSnapSettings',
   );
-  await Hive.openBox('UpdateConfig');
+  await Hive.openBox<UpdateChecker>('UpdateConfig');
 
   runApp(
     ProviderScope(
