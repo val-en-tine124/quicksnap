@@ -36,6 +36,19 @@ extension EditorConfigFromSetting on QuickSnapSettings {
       expands: expands,
       padding: EdgeInsets.all(padding),
       placeholder: 'Type your text here.',
+      // Performance: disable smooth cursor blink animation.
+      // The default cursor blink uses AnimationController.animateTo()
+      // with Curves.easeOut (250ms fade), which fires ~15 animation frames
+      // per blink. Each frame triggers _onColorTick → safeMarkNeedsPaint
+      // on every cursor-containing RenderEditableTextLine, causing a
+      // repaint cascade that saturates the main thread (~289ms overdue timer).
+      //
+      // Setting showCursor: true uses a simpler blink (toggle visibility
+      // every 500ms) without the smooth opacity animation, reducing
+      // per-blink paint overhead from ~15 frames to 1 toggle.
+      showCursor: true,
+      // Paint cursor above text to avoid unnecessary repaint merging.
+      paintCursorAboveText: true,
     );
   }
 }

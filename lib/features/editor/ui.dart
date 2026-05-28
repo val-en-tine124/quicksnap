@@ -132,9 +132,14 @@ class _Editor extends ConsumerWidget {
         Column(
           children: [
             Expanded(
-              child: QuillEditor.basic(
-                controller: controller,
-                config: quickSnapSettings.quillEditorConfig(),
+              // RepaintBoundary isolates the editor's frequent repaints
+              // (cursor blink, text selection) from the parent widget tree,
+              // preventing cascading repaints through the scaffold and drawer.
+              child: RepaintBoundary(
+                child: QuillEditor.basic(
+                  controller: controller,
+                  config: quickSnapSettings.quillEditorConfig(),
+                ),
               ),
             ),
 
