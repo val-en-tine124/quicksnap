@@ -185,6 +185,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.19.1"
+  content_resolver:
+    dependency: "direct main"
+    description:
+      name: content_resolver
+      sha256: d8f577620b8257bf303690247f97028c408c3db19a6dda62419ca81febdcd2c4
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.6"
   convert:
     dependency: transitive
     description:
