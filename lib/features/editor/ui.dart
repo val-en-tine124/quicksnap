@@ -67,7 +67,7 @@ class EditorScaffold extends ConsumerWidget {
               if (context.mounted) {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const SettingsUI()),
+                  MaterialPageRoute(builder: (_) => const SettingsPage()),
                 );
               }
             },
