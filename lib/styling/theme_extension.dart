@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:quicksnap/features/editor/color_tokens.dart';
+import 'package:quicksnap/styling/color_tokens.dart';
 import 'package:quicksnap/styling/app_typo_extension.dart';
 
 @immutable
