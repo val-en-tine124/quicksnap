@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:quicksnap/features/editor/about.dart';
+import 'package:quicksnap/features/about.dart';
 
 void main() {
   testWidgets('Find text on selectable area.', (WidgetTester tester) async {
