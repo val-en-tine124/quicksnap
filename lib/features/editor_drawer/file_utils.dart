@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:typed_data';
 
-import 'package:flutter_quill/quill_delta.dart';
 import 'package:content_resolver/content_resolver.dart';
+import 'package:flutter_quill/quill_delta.dart';
 
 /// Utility functions for file operations related to the editor
 /// class that contains method for handle android files using URI content:// instead of a local cache path.
