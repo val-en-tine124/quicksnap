@@ -4,8 +4,8 @@ import 'package:quicksnap/features/settings/models.dart';
 import 'package:quicksnap/features/settings/providers.dart';
 import 'package:quicksnap/features/widgets.dart';
 
-class SettingsUI extends StatelessWidget {
-  const SettingsUI({super.key});
+class SettingsPage extends StatelessWidget {
+  const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
