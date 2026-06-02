@@ -89,12 +89,16 @@ class UpdateAvailabilityState {
 class UpdateAvailability extends _$UpdateAvailability {
   @override
   Future<UpdateAvailabilityState> build() async {
-    // Get current app info
-    final appInfo = await ref.watch(currentAppInfoProvider.future);
-    final currentVersion = appInfo.version;
 
-    // Get remote update config
-    final remoteConfig = await ref.watch(remoteUpdateConfigProvider.future);
+    final [
+      appInfo as PackageInfo,
+      remoteConfig as UpdateConfig?,
+    ] = await Future.wait([
+      ref.watch(currentAppInfoProvider.future), // Get current app info
+      ref.watch(remoteUpdateConfigProvider.future), // Get remote update config
+    ]);
+    final currentVersion = appInfo.version;
+  
 
     if (remoteConfig == null) {
       return UpdateAvailabilityState(

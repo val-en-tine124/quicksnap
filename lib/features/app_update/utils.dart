@@ -128,7 +128,7 @@ class AppUpdateUtils {
 
     // Delete the file if it already exists
     if (file.existsSync()) {
-      await file.delete();
+      file.deleteSync();
     }
 
     // Track the last notified percentage to throttle notifications
