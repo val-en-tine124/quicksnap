@@ -1,12 +1,6 @@
-import 'dart:convert';
-import 'dart:developer';
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill/quill_delta.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:quicksnap/features/editor_drawer/file_utils.dart';
+import 'package:quicksnap/features/editor_drawer/providers.dart';
 import 'package:quicksnap/features/editor_save_on_exit/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -32,21 +26,21 @@ class AppBarTitle extends _$AppBarTitle {
 }
 
 @riverpod
-class QuicksnapEditor extends _$QuicksnapEditor{
+class QuicksnapEditor extends _$QuicksnapEditor {
   @override
-  QuillController build(){
+  QuillController build() {
     final controller = QuillController.basic(); // Basic controller
-    ref.onDispose(()=> controller.dispose());
+    ref.onDispose(() => controller.dispose());
     return controller;
-    
   }
-  void updateEditorContent(Delta delta){
+
+  void updateEditorContent(Delta delta) {
     final editorController = state..clear(); // clear quill controller state
-        //and the document it hold when opening a new file
-        editorController.document.replace( 
-          0,
-          editorController.document.length,
-          delta,
-        );
+    //and the document it hold when opening a new file
+    editorController.document.replace(
+      0,
+      editorController.document.length,
+      delta,
+    );
   }
 }

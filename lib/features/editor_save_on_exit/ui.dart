@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quicksnap/features/editor/providers.dart';
 import 'package:quicksnap/features/editor/ui.dart';
+import 'package:quicksnap/features/editor_drawer/providers.dart';
 import 'package:quicksnap/features/editor_save_on_exit/providers.dart';
 
 class SaveOnExit extends ConsumerWidget {

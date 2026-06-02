@@ -4,10 +4,10 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:quicksnap/features/editor_drawer/file_utils.dart';
 import 'package:quicksnap/features/editor/providers.dart';
+import 'package:quicksnap/features/editor_drawer/file_utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
+part 'providers.g.dart';
 ///This notifier contains methods for various file operation.
 @riverpod
 class FilePickerNotifier extends AsyncNotifier<PlatformFile?> {

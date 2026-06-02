@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:quicksnap/features/editor/providers.dart';
 import 'package:quicksnap/features/editor_drawer/file_utils.dart';
+import 'package:quicksnap/features/editor_drawer/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'providers.g.dart';

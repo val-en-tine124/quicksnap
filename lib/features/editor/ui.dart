@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quicksnap/features/editor/providers.dart';
+import 'package:quicksnap/features/editor_drawer/providers.dart';
 import 'package:quicksnap/features/editor_save_on_exit/providers.dart';
 import 'package:quicksnap/features/settings/models.dart';
 import 'package:quicksnap/features/settings/providers.dart';
