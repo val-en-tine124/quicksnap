@@ -54,3 +54,4 @@ web/*
 windows/*
 .aider*
 *.continue/
+android/key.properties
