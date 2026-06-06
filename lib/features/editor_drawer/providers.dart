@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quicksnap/features/editor/providers.dart';
 import 'package:quicksnap/features/editor_drawer/file_utils.dart';
@@ -10,9 +10,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'providers.g.dart';
 ///This notifier contains methods for various file operation.
 @riverpod
-class FilePickerNotifier extends AsyncNotifier<PlatformFile?> {
+class FilePickerNotifier extends AsyncNotifier<XFile?> {
   @override
-  Future<PlatformFile?> build() async {
+  Future<XFile?> build() async {
     // Initial state or potentially load last picked file if persisted (future)
     return null;
   }
@@ -20,18 +20,11 @@ class FilePickerNotifier extends AsyncNotifier<PlatformFile?> {
   Future<void> pickFile() async {
     state = const AsyncLoading();
     try {
-      final result = await FilePicker.platform.pickFiles(
-        dialogTitle: 'Select a QuickSnap text file',
-        type: FileType.custom,
-        allowedExtensions: const ['txt', 'log'],
-      );
-
-      if (result != null && result.files.isNotEmpty) {
-        //make sure the file picker picked a file.
-        final firstFile = result.files.first;
-        final delta = await FileContentUtils.fileToDelta(firstFile.identifier!);
+      final result = await FileContentUtils.pickFileAndReadDelta();
+      if (result != null) {
+        final (file, delta) = result;
         ref.read(quicksnapEditorProvider.notifier).updateEditorContent(delta);
-        state = AsyncData(firstFile);
+        state = AsyncData(file);
       } else {
         state = const AsyncData(null); // User cancelled the picker
       }
@@ -45,12 +38,11 @@ class FilePickerNotifier extends AsyncNotifier<PlatformFile?> {
 
   void newFile() {
     state = const AsyncLoading();
-    //ref.read(appBarTitleProvider.notifier).resetTitle();
     ref.read(quicksnapEditorProvider).clear();
     state = const AsyncData(null);
   }
 
-  Future<void> saveFile() async {
+  Future<void> saveFile({String? suggestedName}) async {
     final documentAsText = ref
         .read(quicksnapEditorProvider)
         .document
@@ -60,40 +52,28 @@ class FilePickerNotifier extends AsyncNotifier<PlatformFile?> {
     state = const AsyncLoading();
 
     try {
-      final fileToSave = currentFileState.value;
-      if (fileToSave != null) {
-        FileContentUtils.writeToFile(fileToSave.identifier!, bytesToSave);
+      final currentFile = currentFileState.value;
+      if (currentFile != null) {
+        // Overwrite the existing file using its path
+        await File(currentFile.path).writeAsBytes(bytesToSave);
         log(
-          'got the file identifier:${fileToSave.identifier}',
+          'Wrote bytes of length ${bytesToSave.length} to path ${currentFile.path}',
           name: 'fileSave',
         );
-        // Create a new PlatformFile with updated size
-        final updatedFile = PlatformFile(
-          name: fileToSave.name,
-          path: fileToSave.path,
-          size: bytesToSave.length,
-        );
-        state = AsyncData(updatedFile);
-      } else {
-        // "Save As" a new file
-        final newPath = await FilePicker.platform.saveFile(
-          type: FileType.custom,
-          fileName: 'untitled.txt',
-          allowedExtensions: ['txt'],
-          bytes: bytesToSave,
-        );
+        ref.read(fileJustSavedProvider.notifier).signal();
+        state = AsyncData(currentFile);
 
-        if (newPath != null) {
-          // If user saved the file, update the state with the new file info
-          final fileSize = bytesToSave.length;
-          final newPlatformFile = PlatformFile(
-            name: newPath.split(Platform.pathSeparator).last,
-            path: newPath,
-            size: fileSize,
-          );
-          state = AsyncData(newPlatformFile);
+      } else {
+        // "Save As" — no file is open
+        final savedFile = await FileContentUtils.saveFileAs(
+          bytesToSave,
+          suggestedName: suggestedName ?? 'untitled.txt',
+        );
+        if (savedFile != null) {
+          ref.read(fileJustSavedProvider.notifier).signal();
+          state = AsyncData(savedFile);
         } else {
-          // User cancelled the "Save As" dialog, restore the previous state
+          // User cancelled the "Save As" dialog, restore previous state
           state = currentFileState;
         }
       }

@@ -15,7 +15,7 @@ class _DrawerFsOps extends ConsumerWidget {
     final fileData = ref.read(filePickerProvider.notifier);
     final fileState = ref.watch(filePickerProvider);
     final isEdited = ref.watch(isEditedProvider);
-    final isLoading = fileState.isLoading;
+    final isLoading = fileState.isLoading; // A state change is triggered on Editor change
 
     final fileOpsButtons = <Widget>[
       ListTile(
@@ -35,8 +35,17 @@ class _DrawerFsOps extends ConsumerWidget {
       ListTile(
         onTap: isLoading
             ? null
-            : () {
-                fileData.saveFile();
+            : () async {
+                String? suggestedName;
+                if (fileState.value == null) {
+                  // No file open — ask for a filename first
+                  suggestedName = await showDialog<String>(
+                    context: context,
+                    builder: (ctx) => const _SaveAsDialog(),
+                  );
+                  if (suggestedName == null) return; // User cancelled
+                }
+                await fileData.saveFile(suggestedName: suggestedName);
                 if (!context.mounted) return;
                 Navigator.pop(context);
                 if (fileState.hasValue) {
@@ -86,6 +95,7 @@ class _DrawerFsOps extends ConsumerWidget {
             ).animate().fadeIn(duration: 4.seconds).then().effect().shake(),
           ),
         ),
+        const SizedBox(height: 15),
         ...fileOpsButtons.map((entry) => entry),
       ],
     );
@@ -109,6 +119,36 @@ class _AboutSection extends StatelessWidget {
           );
         }
       },
+    );
+  }
+}
+
+class _SaveAsDialog extends StatelessWidget {
+  const _SaveAsDialog();
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = TextEditingController(text: 'untitled.txt');
+    return AlertDialog(
+      title: const Text('Save As'),
+      content: TextField(
+        controller: controller,
+        decoration: const InputDecoration(
+          labelText: 'File name',
+          hintText: 'Enter file name',
+        ),
+        autofocus: true,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context, controller.text),
+          child: const Text('Save'),
+        ),
+      ],
     );
   }
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:quicksnap/features/editor/providers.dart';
 import 'package:quicksnap/features/editor/ui.dart';
 import 'package:quicksnap/features/editor_drawer/providers.dart';
 import 'package:quicksnap/features/editor_save_on_exit/providers.dart';
@@ -48,7 +47,9 @@ class _SaveOnExitDialogState extends ConsumerState<_SaveOnExitDialog> {
   String? _errorMessage;
 
   Future<void> _handleSave() async {
-    if (_isSaving) return;
+    if (_isSaving) {
+      return; // Prevent issue if this function is called multiple times
+    }
 
     setState(() {
       _isSaving = true;
@@ -56,7 +57,22 @@ class _SaveOnExitDialogState extends ConsumerState<_SaveOnExitDialog> {
     });
 
     try {
-      await widget.ref.read(filePickerProvider.notifier).saveFile();
+      final currentFile = widget.ref.read(filePickerProvider).value;
+      String? suggestedName;
+      if (currentFile == null) {
+        // No file open — ask for a filename first
+        suggestedName = await showDialog<String>(
+          context: context,
+          builder: (ctx) => const _SaveAsExitDialog(),
+        );
+        if (suggestedName == null) {
+          if (mounted) setState(() => _isSaving = false);
+          return; // User cancelled
+        }
+      }
+      await widget.ref
+          .read(filePickerProvider.notifier)
+          .saveFile(suggestedName: suggestedName);
 
       // The edit state should automatically update because:
       // 1. filePickerProvider updates after save
@@ -168,6 +184,36 @@ class _SaveOnExitDialogState extends ConsumerState<_SaveOnExitDialog> {
         TextButton(
           onPressed: _isSaving ? null : _handleCancel,
           child: const Text('Cancel'),
+        ),
+      ],
+    );
+  }
+}
+
+class _SaveAsExitDialog extends StatelessWidget {
+  const _SaveAsExitDialog();
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = TextEditingController(text: 'untitled.txt');
+    return AlertDialog(
+      title: const Text('Save As'),
+      content: TextField(
+        controller: controller,
+        decoration: const InputDecoration(
+          labelText: 'File name',
+          hintText: 'Enter file name',
+        ),
+        autofocus: true,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context, controller.text),
+          child: const Text('Save'),
         ),
       ],
     );
