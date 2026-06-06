@@ -27,6 +27,7 @@ class _SettingsBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
+      itemExtent: 90.0,
       children: [
         const _SectionHeader('Appearance'),
         ListTile(
