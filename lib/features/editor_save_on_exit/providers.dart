@@ -13,14 +13,14 @@ part 'providers.g.dart';
 class EditorInitialContent extends _$EditorInitialContent {
   @override
   FutureOr<List<Map<String, dynamic>>> build() {
-    final platformFile = ref.watch(filePickerProvider);
+    final fileState = ref.watch(filePickerProvider);
     final quicksnapEditor = ref.read(quicksnapEditorProvider);
-    final file = platformFile.asData?.value;
+    final file = fileState.asData?.value;
 
     if (file == null) {
       return quicksnapEditor.document.toDelta().toJson();
     }
-    return FileContentUtils.fileToDeltaJson(file.identifier!);
+    return FileContentUtils.readFileToDeltaJson(file);
   }
 }
 

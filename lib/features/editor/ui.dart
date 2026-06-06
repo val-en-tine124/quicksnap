@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:quicksnap/features/editor/app_bar/providers.dart';
 import 'package:quicksnap/features/editor/providers.dart';
 import 'package:quicksnap/features/editor_drawer/providers.dart';
 import 'package:quicksnap/features/editor_save_on_exit/providers.dart';
@@ -48,14 +49,14 @@ class EditorScaffold extends ConsumerWidget {
     }
 
     // Show error snackbar when editor initial content encounters an error
-    if (editorInitialContentState.hasError) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+    ref.listen(editorInitialContentProvider,(previous, next){
+      if(next.hasError) {
         customScaffoldMessenger(
           context,
           Text('Content Error: ${editorInitialContentState.error}'),
         );
+      }
       });
-    }
 
     return Scaffold(
       appBar: AppBar(
