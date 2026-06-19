@@ -3,8 +3,6 @@ import 'dart:convert';
 
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:quicksnap/features/editor/providers.dart';
-import 'package:quicksnap/features/editor_drawer/file_utils.dart';
-import 'package:quicksnap/features/editor_drawer/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'providers.g.dart';
@@ -13,14 +11,8 @@ part 'providers.g.dart';
 class EditorInitialContent extends _$EditorInitialContent {
   @override
   FutureOr<List<Map<String, dynamic>>> build() {
-    final fileState = ref.watch(filePickerProvider);
     final quicksnapEditor = ref.read(quicksnapEditorProvider);
-    final file = fileState.asData?.value;
-
-    if (file == null) {
-      return quicksnapEditor.document.toDelta().toJson();
-    }
-    return FileContentUtils.readFileToDeltaJson(file);
+    return quicksnapEditor.document.toDelta().toJson();
   }
 }
 
@@ -35,14 +27,26 @@ class IsEdited extends _$IsEdited {
     final quicksnapEditor = ref.watch(quicksnapEditorProvider);
     final previousDeltaAsync = ref.watch(editorInitialContentProvider);
 
-    // Cancel any existing subscription
+    // Cancel any previous subscription + timer before creating new ones.
     _changesSubscription?.cancel();
     _changesSubscription = null;
+    _debounceTimer?.cancel();
+    _debounceTimer = null;
 
     // Set up cleanup
     ref.onDispose(() {
       _changesSubscription?.cancel();
       _debounceTimer?.cancel();
+    });
+
+    // When a file save signal fires, re-baseline the initial content hash
+    // to the current document content so the * (edited indicator) clears.
+    ref.listen(fileJustSavedProvider, (previous, next) {
+      if (previous != next) {
+        final currentDelta = quicksnapEditor.document.toDelta();
+        _initialContentHash = jsonEncode(currentDelta.toJson()).hashCode;
+        state = false;
+      }
     });
 
     // Handle async state - only proceed when we have data
@@ -52,28 +56,26 @@ class IsEdited extends _$IsEdited {
         if (previousDeltaJson.isEmpty) return false;
 
         // Compute a hash of the initial content once.
-        // Previously used DeepCollectionEquality().equals() which recursively
-        // walks the entire nested delta tree on every keystroke (~5-20ms).
-        // Using jsonEncode + hashCode is a single O(n) pass over the data.
-        _initialContentHash = jsonEncode(previousDeltaJson).hashCode;
+        _initialContentHash ??= jsonEncode(previousDeltaJson).hashCode;
 
-        // Compare current document with initial content using hash
-        final currentDelta = quicksnapEditor.document.toDelta();
-        final isDifferent =
-            jsonEncode(currentDelta.toJson()).hashCode != _initialContentHash;
-
-        // Add debounce timer of 50 milliseconds.        
-        _debounceTimer = Timer.periodic(const Duration(milliseconds: 50), (_) {
-          // Set up listener for future changes
-          _changesSubscription = quicksnapEditor.changes.listen((_) {
-            final newCurrentDelta = quicksnapEditor.document.toDelta();
+        // Set up a SINGLE listener for future changes, debounced with a
+        // one-shot Timer (not Timer.periodic). Cancelling the old subscription
+        // and timer above prevents accumulating listeners.
+        _changesSubscription = quicksnapEditor.changes.listen((_) {
+          // Reset the debounce timer on each keystroke.
+          _debounceTimer?.cancel();
+          _debounceTimer = Timer(const Duration(milliseconds: 50), () {
+            final currentDelta = quicksnapEditor.document.toDelta();
             state =
-                jsonEncode(newCurrentDelta.toJson()).hashCode !=
-                _initialContentHash; // Updated comparison on every change
+                jsonEncode(currentDelta.toJson()).hashCode !=
+                _initialContentHash;
           });
         });
 
-        return isDifferent; // Initial comparison result
+        // Initial comparison
+        final currentDelta = quicksnapEditor.document.toDelta();
+        return jsonEncode(currentDelta.toJson()).hashCode !=
+            _initialContentHash;
       },
       orElse: () => false,
     );

@@ -1,9 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:quicksnap/features/editor/app_bar/providers.dart';
+import 'package:quicksnap/features/editor/providers.dart';
 import 'package:quicksnap/features/editor/ui.dart';
-import 'package:quicksnap/features/editor_drawer/providers.dart';
 import 'package:quicksnap/features/editor_save_on_exit/providers.dart';
+import 'package:quicksnap/features/save_to_db/models.dart';
+import 'package:quicksnap/features/save_to_db/providers.dart';
+import 'package:quicksnap/features/widgets.dart';
 
 class SaveOnExit extends ConsumerWidget {
   final EditorScaffold editorScaffold;
@@ -47,9 +53,7 @@ class _SaveOnExitDialogState extends ConsumerState<_SaveOnExitDialog> {
   String? _errorMessage;
 
   Future<void> _handleSave() async {
-    if (_isSaving) {
-      return; // Prevent issue if this function is called multiple times
-    }
+    if (_isSaving) return;
 
     setState(() {
       _isSaving = true;
@@ -57,28 +61,37 @@ class _SaveOnExitDialogState extends ConsumerState<_SaveOnExitDialog> {
     });
 
     try {
-      final currentFile = widget.ref.read(filePickerProvider).value;
-      String? suggestedName;
-      if (currentFile == null) {
+      final rawTitle = widget.ref.read(appBarTitleProvider);
+      final noteName = rawTitle.endsWith(' *')
+          ? rawTitle.substring(0, rawTitle.length - 2)
+          : rawTitle;
+      final controller = widget.ref.read(quicksnapEditorProvider);
+      final editorContent = controller.document.toDelta();
+      final hiveBox = await widget.ref.read(handleHiveBoxProvider.future);
+
+      if (!hiveBox.keys.contains(noteName) || rawTitle == 'Untitled Document') {
         // No file open — ask for a filename first
-        suggestedName = await showDialog<String>(
+        if (!context.mounted) return;
+        final suggestedName = await showDialog<String>(
           context: context,
-          builder: (ctx) => const _SaveAsExitDialog(),
+          builder: (ctx) => const SaveAsExitDialog(),
         );
         if (suggestedName == null) {
           if (mounted) setState(() => _isSaving = false);
           return; // User cancelled
         }
+        await hiveBox.put(
+          suggestedName,
+          QuickSnapNote(deltaJson: jsonEncode(editorContent.toJson())),
+        );
+      } else {
+        await hiveBox.put(
+          noteName,
+          QuickSnapNote(deltaJson: jsonEncode(editorContent.toJson())),
+        );
       }
-      await widget.ref
-          .read(filePickerProvider.notifier)
-          .saveFile(suggestedName: suggestedName);
 
-      // The edit state should automatically update because:
-      // 1. filePickerProvider updates after save
-      // 2. editorInitialContentProvider watches filePickerProvider and rebuilds
-      // 3. isEditedProvider watches editorInitialContentProvider and recalculates
-
+      widget.ref.read(fileJustSavedProvider.notifier).signal();
       // Use a post-frame callback to ensure we're in a valid frame
       // This is important because saveFile() shows a native dialog
       // which can cause the widget tree to rebuild
@@ -184,36 +197,6 @@ class _SaveOnExitDialogState extends ConsumerState<_SaveOnExitDialog> {
         TextButton(
           onPressed: _isSaving ? null : _handleCancel,
           child: const Text('Cancel'),
-        ),
-      ],
-    );
-  }
-}
-
-class _SaveAsExitDialog extends StatelessWidget {
-  const _SaveAsExitDialog();
-
-  @override
-  Widget build(BuildContext context) {
-    final controller = TextEditingController(text: 'untitled.txt');
-    return AlertDialog(
-      title: const Text('Save As'),
-      content: TextField(
-        controller: controller,
-        decoration: const InputDecoration(
-          labelText: 'File name',
-          hintText: 'Enter file name',
-        ),
-        autofocus: true,
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
-        ),
-        TextButton(
-          onPressed: () => Navigator.pop(context, controller.text),
-          child: const Text('Save'),
         ),
       ],
     );
