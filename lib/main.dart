@@ -4,8 +4,8 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:quicksnap/features/app_update/ui.dart';
-import 'package:quicksnap/features/editor_drawer/ui.dart';
 import 'package:quicksnap/features/editor_save_on_exit/ui.dart';
+import 'package:quicksnap/features/save_to_db/ui.dart';
 import 'package:quicksnap/features/settings/models.dart';
 import 'package:quicksnap/features/settings/ui.dart';
 import 'package:quicksnap/styling/theme_data.dart';
@@ -59,7 +59,7 @@ class QuickSnapApp extends ConsumerWidget {
       home: const UpdateChecker(
         child: SaveOnExit(
           editorScaffold: EditorScaffold(
-            drawer: EditorDrawer(),
+            drawer: DBNotesDrawer(),
             settingsPage: SettingsPage(),
           ),
         ),
