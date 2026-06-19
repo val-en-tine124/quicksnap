@@ -268,3 +268,33 @@ class _RainBowTextState extends State<RainBowText>
     );
   }
 }
+
+class SaveAsExitDialog extends StatelessWidget {
+  const SaveAsExitDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = TextEditingController(text: 'untitled');
+    return AlertDialog(
+      title: const Text('Save As'),
+      content: TextField(
+        controller: controller,
+        decoration: const InputDecoration(
+          labelText: 'File name',
+          hintText: 'Enter file name',
+        ),
+        autofocus: true,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context, controller.text),
+          child: const Text('Save'),
+        ),
+      ],
+    );
+  }
+}

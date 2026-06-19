@@ -1,8 +1,10 @@
-import 'package:flutter_quill/quill_delta.dart';
 
 class QuickSnapNote{
-  final Delta delta;
+  final String deltaJson;
   /// Milliseconds since epoch.
-  final int dateCreated;
-  QuickSnapNote({required this.delta,required this.dateCreated});
+  late int dateCreated;
+  QuickSnapNote({required this.deltaJson,}){
+    dateCreated = DateTime.now().millisecondsSinceEpoch;
+  }
+  
 }
