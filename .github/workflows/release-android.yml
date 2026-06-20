@@ -36,7 +36,7 @@ jobs:
 
       - name: Create keystore file
         run: |
-          $b64 = "${{ secrets.KEY_STORE }}"
+          $b64 = "${{ secrets.KEY_STORE }}" -replace "`r|`n", ""
           $filename = "./android/upload-keystore.jks"
           $bytes =[Convert]::FromBase64String($b64)
           [IO.File]::WriteAllBytes($filename, $bytes)
