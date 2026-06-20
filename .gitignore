@@ -18,9 +18,7 @@ migrate_working_dir/
 *.iws
 .idea/
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
+# VS Code related
 .vscode/
 
 # Flutter/Dart/Pub related
@@ -36,22 +34,26 @@ migrate_working_dir/
 *.g.yaml
 *.freezed.dart
 
-# Symbolication related
+# Symbolication and Obfuscation related
 app.*.symbols
-
-# Obfuscation related
 app.*.map.json
 
-# Android Studio will place build artifacts here
+# --- FIXED PLATFORM RULES ---
+# Ignore Android local configuration and build outputs, NOT the whole directory
+.gradle/
+local.properties
+android/key.properties
+android/app/src/main/res/values/google-services.json
+
+# Android Studio project-specific files
+.navigation/
+captures/
+*.apk
+*.ap_
+*.aab
+
+# Hardware specific folder ignores (Safe defaults)
+# modified from blanket "*" ignores to allow tracking of source files
 /android/app/debug
 /android/app/profile
 /android/app/release
-ios/*
-android/*
-linux/*
-macos/*
-web/*
-windows/*
-.aider*
-*.continue/
-android/key.properties
