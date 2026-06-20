@@ -44,7 +44,7 @@ jobs:
           $b64 = "${{ secrets.KEY_STORE }}" -replace "`r|`n", ""
           $filename = Join-Path $appDir "upload-keystore.jks"
           $bytes = [Convert]::FromBase64String($b64)
-          Set-Content -Path $filename -Value $bytes -AsByteStream
+          [IO.File]::WriteAllBytes($filename, $bytes)
 
       - name: Create Keystore properties
         shell: powershell
