@@ -93,7 +93,7 @@ lib/
 |---|---|
 | `flutter_riverpod` | State management |
 | `flutter_quill` | Rich text editing |
-| `hive_ce` + `flutter_secure_storage` | Local encrypted storage |
+| `hive_ce` | Local encrypted storage |
 | `riverpod_annotation` + `build_runner` | Code generation (providers) |
 | `freezed` | Immutable models |
 | `dio` | HTTP client for update checks |
