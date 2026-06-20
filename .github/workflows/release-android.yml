@@ -32,26 +32,35 @@ jobs:
           $vLine = Select-String -Path pubspec.yaml -Pattern '^version:\s*(\S+)' | Select-Object -First 1
           if (-not $vLine) { Write-Error 'version not found in pubspec.yaml'; exit 1 }
           $ver = $vLine.Matches[0].Groups[1].Value.Split('+')[0]
-          echo "VERSION=$ver" >> $env:GITHUB_ENV
+          Add-Content -Path $env:GITHUB_ENV -Value "VERSION=$ver" -Encoding utf8
 
       - name: Create keystore file
+        shell: powershell
         run: |
+          $androidDir = Join-Path $env:GITHUB_WORKSPACE "android"
+          if (-not (Test-Path $androidDir)) { New-Item -ItemType Directory -Force -Path $androidDir }
+          
           $b64 = "${{ secrets.KEY_STORE }}" -replace "`r|`n", ""
-          $filename = Join-Path $env:GITHUB_WORKSPACE "android\upload-keystore.jks"
-          $bytes =[Convert]::FromBase64String($b64)
+          $filename = Join-Path $androidDir "upload-keystore.jks"
+          $bytes = [Convert]::FromBase64String($b64)
           [IO.File]::WriteAllBytes($filename, $bytes)
 
       - name: Create Keystore properties
+        shell: powershell
         run: |
-          echo keyPassword=\${{ secrets.KEY_PASSWORD }} > ./android/key.properties
-          echo storePassword=\${{ secrets.STORE_PASSWORD }} >> ./android/key.properties
-          echo keyAlias=\${{ secrets.KEY_ALIAS }} >> ./android/key.properties
-          echo storeFile=upload-keystore.jks >> ./android/key.properties
+          $props = @"
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          storePassword=${{ secrets.STORE_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          storeFile=upload-keystore.jks
+          "@
+          Set-Content -Path "android\key.properties" -Value $props -Encoding utf8
 
       - name: Build App files
         run: flutter build apk --release --split-per-abi --build-number ${{github.run_number}}
 
       - name: Verify Sign
+        shell: powershell
         run: |
           $buildToolsDir = Get-ChildItem "$env:ANDROID_HOME\build-tools" | Where-Object { $_.PSIsContainer } | Sort-Object Name -Descending | Select-Object -First 1
           Write-Host "Using build tools version: $($buildToolsDir.Name)"
@@ -69,7 +78,8 @@ jobs:
           Rename-Item -Path "build/app/outputs/flutter-apk/app-x86_64-release.apk" -NewName "quicksnap_android_v$env:VERSION+${{github.run_number}}_x86_64.apk"
 
       - name: Create build-number.txt file
-        run: echo ${{github.run_number}} > build-number.txt
+        shell: powershell
+        run: Set-Content -Path build-number.txt -Value "${{github.run_number}}" -Encoding utf8
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
