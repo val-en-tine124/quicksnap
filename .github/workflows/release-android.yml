@@ -93,5 +93,5 @@ jobs:
             build-number.txt
           tag: v${{ env.VERSION }}+${{github.run_number}}
           token: ${{secrets.GITHUB_TOKEN}}
-          prerelease: true
+          prerelease: false
           allowUpdates: true
