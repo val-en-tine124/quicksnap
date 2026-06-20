@@ -1,25 +1,26 @@
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'models.dart';
-import 'utils.dart';
 
 part 'providers.g.dart';
+
+/// The owner of the GitHub repository.
+const _repoOwner = 'val-en-tine124';
+
+/// The name of the GitHub repository.
+const _repoName = 'quicksnap';
+
+/// The GitHub API base URL.
+const _githubApiBase = 'https://api.github.com';
 
 @riverpod
 class UpdateConfigCache extends _$UpdateConfigCache {
   @override
   Future<UpdateConfig?> build() async {
-    if (!ref.mounted) return null;
-    state = AsyncValue.data(
-      await _loadFromHive(),
-    ); // This cache provider can be used to store the last fetched update config
-    // and return it when the network is unavailable.
-    // Initially, there is no cached config.
-    return state.value;
+    return _loadFromHive();
   }
 
   Future<void> saveToHive(UpdateConfig updateConfig) async {
@@ -39,23 +40,52 @@ Future<PackageInfo> currentAppInfo(Ref ref) async {
   return PackageInfo.fromPlatform();
 }
 
-/// Provider that fetches the remote update configuration.
+/// Provider that fetches the remote update configuration from GitHub Releases.
 ///
-/// This provider fetches the update config from a remote JSON endpoint.
-/// For demonstration, you would replace the URL with your actual update server.
+/// Fetches the latest release from:
+///   GET /repos/{owner}/{repo}/releases?per_page=1
+///
+/// Compares the build number from the latest release tag with the
+/// current app's build number to determine if an update is available.
 @riverpod
 Future<UpdateConfig?> remoteUpdateConfig(Ref ref) async {
-  // TODO: Replace with your actual update server URL
-  const updateUrl =
-      'http://127.0.0.1:8000/update.json'; // change to 'http://10.0.2.2:8000/update.json' temporarily for testing with Android emulator
+  final appInfo = await ref.watch(currentAppInfoProvider.future);
+  final currentBuildNumber = int.tryParse(appInfo.buildNumber) ?? 0;
+
   try {
-    final response = await Dio().get(updateUrl);
+    final response = await Dio().get<List<dynamic>>(
+      '$_githubApiBase/repos/$_repoOwner/$_repoName/releases',
+      queryParameters: {'per_page': 1},
+      options: Options(
+        headers: {
+          'Accept': 'application/vnd.github+json',
+          'User-Agent': 'QuickSnap-App',
+        },
+      ),
+    );
+
     if (response.statusCode == 200) {
-      final config = UpdateConfig.fromJson(
-        response.data as Map<String, dynamic>,
-      );
-      await ref.read(updateConfigCacheProvider.notifier).saveToHive(config);
-      return config;
+      final releases = response.data as List<dynamic>;
+      if (releases.isEmpty) return null;
+
+      final latestRelease = releases.first as Map<String, dynamic>;
+      final config = UpdateConfig.fromGitHubRelease(latestRelease);
+
+      // Compare semantic version first, then fall back to build number
+      // when versions are equal.
+      final versionComparison =
+          _compareVersions(appInfo.version, config.latestVersion);
+      if (versionComparison < 0) {
+        // Remote semantic version is strictly higher → update available
+        await ref.read(updateConfigCacheProvider.notifier).saveToHive(config);
+        return config;
+      } else if (versionComparison == 0) {
+        // Same version → compare build numbers
+        if (config.buildNumber > currentBuildNumber) {
+          await ref.read(updateConfigCacheProvider.notifier).saveToHive(config);
+          return config;
+        }
+      }
     }
     return null;
   } catch (e) {
@@ -89,7 +119,6 @@ class UpdateAvailabilityState {
 class UpdateAvailability extends _$UpdateAvailability {
   @override
   Future<UpdateAvailabilityState> build() async {
-
     final [
       appInfo as PackageInfo,
       remoteConfig as UpdateConfig?,
@@ -98,7 +127,6 @@ class UpdateAvailability extends _$UpdateAvailability {
       ref.watch(remoteUpdateConfigProvider.future), // Get remote update config
     ]);
     final currentVersion = appInfo.version;
-  
 
     if (remoteConfig == null) {
       return UpdateAvailabilityState(
@@ -121,73 +149,7 @@ class UpdateAvailability extends _$UpdateAvailability {
 
   /// Refreshes the update check.
   Future<void> checkForUpdates() async {
-    state = const AsyncLoading();
     ref.invalidateSelf();
-    state = AsyncValue.data(await future);
-  }
-}
-
-/// Provider for managing the download state of an update.
-///
-/// This provider handles the APK download and installation process.
-@riverpod
-class UpdateDownloadState extends _$UpdateDownloadState {
-  @override
-  AsyncValue<void> build() {
-    // Cancel any pending work when the provider is disposed
-    ref.onDispose(() async {
-      await AppUpdateUtils.cancelNotification();
-    });
-    return const AsyncData(null);
-  }
-
-  /// Downloads and installs the update.
-  ///
-  /// This method:
-  /// 1. Requests necessary permissions
-  /// 2. Downloads the APK to the temporary directory
-  /// 3. Triggers the Android package installer
-  /// 4. Show progress info
-  Future<void> downloadAndUpdate({
-    required String downloadUrl,
-    required void Function(double progress) onProgress,
-  }) async {
-    state = const AsyncValue.loading();
-
-    try {
-      // Request permissions
-      final hasPermission = await AppUpdateUtils.requestInstallPermission();
-      if (!hasPermission) {
-        state = AsyncValue.error(
-          Exception('Installation permission denied'),
-          StackTrace.current,
-        );
-        return;
-      }
-
-      // Download the APK with progress tracking
-      final apkFile = await AppUpdateUtils.downloadApk(
-        downloadUrl: downloadUrl,
-        onProgress: (progress) {
-          onProgress.call(progress);
-        },
-      );
-
-      // Install the APK
-      await AppUpdateUtils.installApk(apkFile);
-      if (!ref.mounted) return;
-      state = const AsyncValue.data(null);
-    } catch (e, stackTrace) {
-      if (!ref.mounted) return;
-      state = AsyncValue.error(e, stackTrace);
-    }
-  }
-
-  /// Cancels the current download.
-  Future<void> cancelDownload() async {
-    await AppUpdateUtils.cancelNotification();
-    if (!(ref.mounted)) return;
-    state = const AsyncValue.data(null);
   }
 }
 
@@ -215,23 +177,4 @@ int _compareVersions(String version1, String version2) {
   }
 
   return 0;
-}
-
-enum DeviceArch {
-  // ignore: constant_identifier_names
-  Armeabiv7a,
-  // ignore: constant_identifier_names
-  Armeabiv8a,
-}
-
-Future<DeviceArch> checkArchitecture() async {
-  final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-  final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-
-  // supportedAbis returns a list of ABIs supported by the device in order of preference
-  final List<String?> abis = androidInfo.supportedAbis;
-  if (abis.contains('arm64-v8a')) {
-    return DeviceArch.Armeabiv8a;
-  }
-  return DeviceArch.Armeabiv7a;
 }

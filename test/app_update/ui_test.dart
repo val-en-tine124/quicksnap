@@ -99,39 +99,11 @@ void main() {
       },
     );
 
-    testWidgets('shows mandatory update warning when isMandatory is true', (
-      WidgetTester tester,
-    ) async {
-      const config = UpdateConfig(
-        latestVersion: '2.0.0',
-        downloadUrlV8a: 'https://example.com/app.apk',
-        downloadUrlV7a: 'https://example.com/app.apk',
-        isMandatory: true,
-      );
+  
+   
+  
 
-      await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: QuickSnapUpdateDialog(
-              updateConfig: config,
-              isMandatory: true,
-            ),
-          ),
-        ),
-      );
-
-      await tester.pump();
-
-      // Check for the warning text
-      expect(
-        find.text('This update is required to continue using the app.'),
-        findsOneWidget,
-      );
-    });
-
-    testWidgets('does not show mandatory warning when isMandatory is false', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('shows "Download Update" button', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
           child: MaterialApp(
@@ -149,81 +121,7 @@ void main() {
         ),
       );
 
-      expect(
-        find.text('This update is required to continue using the app.'),
-        findsNothing,
-      );
-    });
-
-    testWidgets('shows "Later" button when update is not mandatory', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: Scaffold(
-              body: QuickSnapUpdateDialog(
-                updateConfig: UpdateConfig(
-                  latestVersion: '2.0.0',
-                  downloadUrlV8a: 'https://example.com/app.apk',
-                  downloadUrlV7a: 'https://example.com/app.apk',
-                  isMandatory: false,
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      expect(find.text('Later'), findsOneWidget);
-    });
-
-    testWidgets('does not show "Later" button when update is mandatory', (
-      WidgetTester tester,
-    ) async {
-      const config = UpdateConfig(
-        latestVersion: '2.0.0',
-        downloadUrlV8a: 'https://example.com/app.apk',
-        downloadUrlV7a: 'https://example.com/app.apk',
-        isMandatory: true,
-      );
-
-      await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: QuickSnapUpdateDialog(
-              updateConfig: config,
-              isMandatory: true,
-            ),
-          ),
-        ),
-      );
-
-      await tester.pump();
-
-      // When isMandatory is true, the "Later" button should not be shown
-      expect(find.text('Later'), findsNothing);
-    });
-
-    testWidgets('shows "Update Now" button', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: Scaffold(
-              body: QuickSnapUpdateDialog(
-                updateConfig: UpdateConfig(
-                  latestVersion: '2.0.0',
-                  downloadUrlV8a: 'https://example.com/app.apk',
-                  downloadUrlV7a: 'https://example.com/app.apk',
-                  isMandatory: false,
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      expect(find.text('Update Now'), findsOneWidget);
+      expect(find.text('Download Update'), findsOneWidget);
     });
 
     testWidgets('"Later" button dismisses dialog with false', (
@@ -304,24 +202,10 @@ void main() {
       await tester.tap(find.text('Show Dialog'));
       await tester.pump();
 
-      await tester.tap(find.text('Update Now'));
+      await tester.tap(find.text('Download Update'));
       await tester.pump();
 
       expect(dialogResult, true);
-    });
-    testWidgets('Show linear progress bar', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: Scaffold(
-              body:QuicksnapUpdateProgressBar(progress: 1.0,),
-            ),
-          ),
-        ),
-      );
-
-      expect(find.byType(LinearProgressIndicator), findsOneWidget);
-      expect(find.text('Updating QuickSnap ...'), findsOneWidget);
     });
   });
 
