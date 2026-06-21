@@ -7,6 +7,9 @@ jobs:
   build-android:
     name: Build Android APK
     runs-on: windows-latest
+    # ADD THESE LINES HERE 👇
+    permissions:
+      contents: write  # Allows the runner to create tags and releases
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
