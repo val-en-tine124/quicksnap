@@ -61,7 +61,8 @@ jobs:
           keyAlias=${{ secrets.KEY_ALIAS }}
           storeFile=upload-keystore.jks
           "@
-          Set-Content -Path "android\key.properties" -Value $props -Encoding utf8
+          # Use UTF-8 without BOM — Java's Properties.load() chokes on BOM
+          [System.IO.File]::WriteAllText("android\key.properties", $props, [System.Text.UTF8Encoding]::new($false))
 
       - name: Build App files
         run: flutter build apk --release --split-per-abi --build-number ${{github.run_number}}

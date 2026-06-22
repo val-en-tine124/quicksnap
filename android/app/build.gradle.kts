@@ -46,6 +46,19 @@ android {
                 keyPassword = keystoreProperties["keyPassword"] as? String
                 storeFile = keystoreProperties["storeFile"]?.let { file(it) }
                 storePassword = keystoreProperties["storePassword"] as? String
+
+                // Fail early with a clear message if any required property is missing/empty
+                val missing = mutableListOf<String>()
+                if (keyAlias.isNullOrBlank()) missing.add("keyAlias")
+                if (keyPassword.isNullOrBlank()) missing.add("keyPassword")
+                if (storePassword.isNullOrBlank()) missing.add("storePassword")
+                if (storeFile == null || !storeFile.exists()) missing.add("storeFile")
+                if (missing.isNotEmpty()) {
+                    throw GradleException(
+                        "Release signing config is missing required properties: ${missing.joinToString()}. " +
+                        "Check that android/key.properties has valid values (no BOM, no empty values)."
+                    )
+                }
             }
         }
     }
