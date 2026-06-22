@@ -9,11 +9,9 @@ A simple but comprehensive cross-platform text and image vault for Android. Quic
 ## ✨ Features
 
 - 📝 **Rich Text Editor** — powered by Flutter Quill with full formatting support
-- 🖼️ **Image Vault** — store and view images securely in-app
 - 🔒 **Offline-First** — local Hive + Flutter Secure Storage, no cloud dependency
-- 🔐 **Privacy Focused** — biometric lock, encrypted local database
+- 🔐 **Privacy Focused** — encrypted local database
 - 🎨 **Themes** — Light, Dark, and System theme support with custom accent colors
-- 🌍 **Localized** — multi-language support
 - ⚡ **Fast & Lightweight** — optimized performance with minimal footprint
 - 🔄 **Auto-Updates** — built-in update checker with changelog support
 
