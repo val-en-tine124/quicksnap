@@ -27,7 +27,7 @@ Get the latest APK from the [GitHub Releases](https://github.com/val-en-tine124/
 |---|---|
 | `arm64-v8a` | Most modern Android devices (64-bit) |
 | `armeabi-v7a` | Older 32-bit Android devices |
-| `universal` | Works on all devices (larger file size) |
+| `X86_64` |  For 64-bit Intel or AMD processors Powered Device|
 
 > **Note**: QuickSnap requires Android 8.0 (API 26) or higher.
 
@@ -52,7 +52,7 @@ cd quicksnap
 flutter pub get
 
 # Generate code (Riverpod, Freezed, Hive adapters)
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 
 # Run on a connected device / emulator
 flutter run
