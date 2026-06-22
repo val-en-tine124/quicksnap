@@ -61,6 +61,7 @@ class EditorScaffold extends ConsumerWidget {
         ),
         actions: [
           IconButton(
+            tooltip: 'Save',
             icon: const Icon(Icons.save),
             onPressed: () async {
               // Safely extract note name, handling the trailing ' *' suffix
