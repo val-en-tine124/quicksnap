@@ -1,4 +1,4 @@
-package com.example.quicksnap
+package com.quicksnap.noteapp
 
 import io.flutter.embedding.android.FlutterActivity
 
