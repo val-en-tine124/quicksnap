@@ -339,8 +339,8 @@ class GlassBox extends StatelessWidget {
       child: ClipRRect(
         borderRadius: borderRadius,
         child: SizedBox(
-          width: 300.0,
-          height: 300.0,
+          width: 350.0,
+          height: 350.0,
           child: Stack(
             children: [
               // The BackdropFilter(blur) was removed here: it forced the engine
@@ -405,7 +405,7 @@ class _AuthorInfoState extends State<AuthorInfo> {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: .center,
-      mainAxisAlignment: .center,
+      mainAxisAlignment: .spaceAround,
       children: [
         RepaintBoundary(
           child: ValueListenableBuilder(
@@ -442,7 +442,6 @@ class _AuthorInfoState extends State<AuthorInfo> {
           ),
         ),
 
-        const SizedBox(height: 10),
         const Text(
           'Enjoying QuickSnap ?',
           style: TextStyle(
