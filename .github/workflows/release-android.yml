@@ -9,7 +9,7 @@ jobs:
     runs-on: windows-latest
     # ADD THESE LINES HERE 👇
     permissions:
-      contents: write  # Allows the runner to create tags and releases
+      contents: write # Allows the runner to create tags and releases
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -17,21 +17,21 @@ jobs:
       - name: Setup-Java
         uses: actions/setup-java@v3.12.0
         with:
-          distribution: 'oracle'
-          java-version: '17'
+          distribution: "oracle"
+          java-version: "17"
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.41.9'
-          channel: 'stable'
+          flutter-version: "3.41.9"
+          channel: "stable"
 
       - name: Install Dependencies
         run: flutter pub get
 
       - name: Run Code Generation
         run: dart run build_runner build
-        
+
       - name: Extract version from pubspec.yaml
         shell: powershell
         run: |
@@ -46,7 +46,7 @@ jobs:
           # FIXED: Save directly into android/app/ so Gradle pathing resolves cleanly
           $appDir = Join-Path $env:GITHUB_WORKSPACE "android\app"
           if (-not (Test-Path $appDir)) { New-Item -ItemType Directory -Force -Path $appDir }
-          
+
           $b64 = "${{ secrets.KEY_STORE }}" -replace "`r|`n", ""
           $filename = Join-Path $appDir "upload-keystore.jks"
           $bytes = [Convert]::FromBase64String($b64)
@@ -99,9 +99,19 @@ jobs:
             build/app/outputs/flutter-apk/quicksnap_android_v${{ env.VERSION }}+${{github.run_number}}_x86_64.apk
             build-number.txt
 
+      - name: Build Changelog
+        id: github_release_notes
+        uses: mikepenz/release-changelog-builder-action@v6
+        with:
+          mode: "HYBRID"
+          configuration: "configuration.json"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
+          body: ${{steps.github_release.outputs.changelog}}
           artifacts: |
             build/app/outputs/flutter-apk/quicksnap_android_v${{ env.VERSION }}+${{github.run_number}}_armeabi-v7a.apk
             build/app/outputs/flutter-apk/quicksnap_android_v${{ env.VERSION }}+${{github.run_number}}_arm64-v8a.apk

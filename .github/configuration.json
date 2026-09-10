@@ -1,0 +1,59 @@
+{
+    "categories": [
+        {
+            "key": "features",
+            "title": "## 🚀 Features",
+            "labels": [
+                "feat",
+                "feature"
+            ]
+        },
+        {
+            "key": "fixes",
+            "title": "## 🐛 Bug Fixes",
+            "labels": [
+                "fix"
+            ]
+        },
+        {
+            "key": "maintainance",
+            "title": "##🧰 Maintenance",
+            "labels": [
+                "chore",
+                "refactor",
+                "ci",
+                "optimize"
+            ]
+        },
+        {
+            "key": "tests",
+            "title": "## 🧪 Tests",
+            "labels": [
+                "test"
+            ]
+        },
+        {
+            "key": "docs",
+            "title": "## 📚 Documentation",
+            "labels": [
+                "docs"
+            ]
+        }
+    ],
+    "ignore_labels": [
+        "ignore"
+    ],
+    "label_extractors": [
+        {
+            "pattern": "^([a-zA-Z]+)(?:\\([^)]+\\))?!?:",
+            "target": "$1",
+            "on_property": "title"
+        }
+    ],
+    "template": "#{{CHANGELOG}}\n\n<details>\n<summary>Uncategorized</summary>\n\n#{{UNCATEGORIZED}}\n</details>",
+    "sort": {
+        "order": "ASC",
+        "on_property": "mergedAt"
+    },
+    "pr_template": "- ${TITLE} (${NUMBER}) by @${AUTHOR}"
+}
