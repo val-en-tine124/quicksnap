@@ -16,8 +16,8 @@
             ]
         },
         {
-            "key": "maintainance",
-            "title": "##🧰 Maintenance",
+            "key": "maintenance",
+            "title": "## 🧰 Maintenance",
             "labels": [
                 "chore",
                 "refactor",
@@ -47,13 +47,15 @@
         {
             "pattern": "^([a-zA-Z]+)(?:\\([^)]+\\))?!?:",
             "target": "$1",
+            "on_property": "commit"
+        },
+        {
+            "pattern": "^([a-zA-Z]+)(?:\\([^)]+\\))?!?:",
+            "target": "$1",
             "on_property": "title"
         }
     ],
     "template": "#{{CHANGELOG}}\n\n<details>\n<summary>Uncategorized</summary>\n\n#{{UNCATEGORIZED}}\n</details>",
-    "sort": {
-        "order": "ASC",
-        "on_property": "mergedAt"
-    },
-    "pr_template": "- ${TITLE} (${NUMBER}) by @${AUTHOR}"
+    "pr_template": "- #{{TITLE}} (#{{NUMBER}}) by @#{{AUTHOR}}",
+    "commit_template": "- #{{TITLE}} (#{{HASH}}) by @#{{AUTHOR}}"
 }
