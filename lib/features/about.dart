@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -12,8 +11,10 @@ import 'package:url_launcher/url_launcher.dart' as launcher;
 const Color kBackgroundColor = Color(0xFF0B0710);
 const Color kPrimaryTextColor = Colors.white;
 const Color kSecondaryTextColor = Color(0xFFC3B9CF);
-// Make the frosted card a bit less translucent so it reads clearer on darkbg
-const Color kCardBackgroundColor = Color.fromRGBO(40, 32, 50, 0.18);
+// Make the frosted card a bit less translucent so it reads clearer on darkbg.
+// Raised alpha after removing the expensive BackdropFilter blur so the card
+// still visually separates from the particle background beneath it.
+const Color kCardBackgroundColor = Color.fromRGBO(40, 32, 50, 0.32);
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -159,6 +160,21 @@ class _ParticleBackgroundState extends State<ParticleBackground>
   // track time between frames for smooth motion (seconds)
   late double _lastTickSeconds;
 
+  Particle _createParticle() {
+    return Particle(
+      x: _random.nextDouble(),
+      y: _random.nextDouble(),
+      radius: _random.nextDouble() * 1.5 + 0.5,
+      // velocities are in normalized units per second (x: left/right, y: up/down)
+      // give a gentle upward bias so particles slowly drift up the screen
+      vx: (_random.nextDouble() - 0.5) * 0.01,
+      vy: -(_random.nextDouble() * 0.02 + 0.002),
+      lifespan: _random.nextDouble() * 8 + 4, // 4..12s
+      isSharp: _random.nextDouble() > 0.4,
+      maxLifespan: _random.nextDouble() * 8 + 4,
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -173,20 +189,36 @@ class _ParticleBackgroundState extends State<ParticleBackground>
     );
   }
 
-  Particle _createParticle() {
-    return Particle(
-      position: Offset(_random.nextDouble(), _random.nextDouble()),
-      radius: _random.nextDouble() * 1.5 + 0.5,
-      // velocities are in normalized units per second (x: left/right, y: up/down)
-      // give a gentle upward bias so particles slowly drift up the screen
-      velocity: Offset(
-        (_random.nextDouble() - 0.5) * 0.01,
-        -(_random.nextDouble() * 0.02 + 0.002),
-      ),
-      lifespan: _random.nextDouble() * 8 + 4, // 4..12s
-      isSharp: _random.nextDouble() > 0.4,
-      maxLifespan: 0.0,
-    )..maxLifespan = _random.nextDouble() * 8 + 4;
+  /// Advances the simulation by [dt] seconds. Mutates particle fields in place
+  /// to avoid allocating transient Offset objects in the hot path.
+  void _stepParticles(double dt) {
+    for (var p in _particles) {
+      // decrease lifespan by real time
+      p.lifespan -= dt;
+      // move according to velocity (velocity is per-second)
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+
+      // when particle dies, respawn at bottom with new random life/velocity
+      if (p.lifespan <= 0) {
+        p.x = _random.nextDouble();
+        p.y = 1.02 + _random.nextDouble() * 0.06;
+        p.lifespan = _random.nextDouble() * 8 + 4;
+        p.maxLifespan = p.lifespan;
+        // slight variation so new particle isn't identical
+        p.vx = (_random.nextDouble() - 0.5) * 0.01;
+        p.vy = -(_random.nextDouble() * 0.02 + 0.002);
+      }
+
+      // wrap horizontally
+      if (p.x < -0.1) p.x = 1.1;
+      if (p.x > 1.1) p.x = -0.1;
+      // if particle floats too far above, move it back to bottom to keep counts stable
+      if (p.y < -0.2) {
+        p.x = _random.nextDouble();
+        p.y = 1.02 + _random.nextDouble() * 0.06;
+      }
+    }
   }
 
   @override
@@ -205,41 +237,8 @@ class _ParticleBackgroundState extends State<ParticleBackground>
         final dt = (now - _lastTickSeconds).clamp(0.0, 0.05);
         _lastTickSeconds = now;
 
-        for (var p in _particles) {
-          // decrease lifespan by real time
-          p.lifespan -= dt;
-          // move according to velocity (velocity is per-second)
-          p.position = Offset(
-            p.position.dx + p.velocity.dx * dt,
-            p.position.dy + p.velocity.dy * dt,
-          );
+        _stepParticles(dt);
 
-          // when particle dies, respawn at bottom with new random life/velocity
-          if (p.lifespan <= 0) {
-            p.position = Offset(
-              _random.nextDouble(),
-              1.02 + _random.nextDouble() * 0.06,
-            );
-            p.lifespan = _random.nextDouble() * 8 + 4;
-            p.maxLifespan = p.lifespan;
-            // slight variation so new particle isn't identical
-            p.velocity = Offset(
-              (_random.nextDouble() - 0.5) * 0.01,
-              -(_random.nextDouble() * 0.02 + 0.002),
-            );
-          }
-
-          // wrap horizontally
-          if (p.position.dx < -0.1) p.position = Offset(1.1, p.position.dy);
-          if (p.position.dx > 1.1) p.position = Offset(-0.1, p.position.dy);
-          // if particle floats too far above, move it back to bottom to keep counts stable
-          if (p.position.dy < -0.2) {
-            p.position = Offset(
-              p.position.dx,
-              1.02 + _random.nextDouble() * 0.06,
-            );
-          }
-        }
         return CustomPaint(
           size: Size.infinite,
           painter: ParticlePainter(_particles),
@@ -284,35 +283,22 @@ class ParticlePainter extends CustomPainter {
       final progress = 1.0 - (p.lifespan / p.maxLifespan);
       final opacity = max(0.0, -4 * (progress - 0.5) * (progress - 0.5) + 1);
       final particleColor = Colors.white.withValues(alpha: opacity * 0.35);
+      // Single Offset per particle, computed once and reused by both calls.
+      final position = Offset(p.x * size.width, p.y * size.height);
 
       if (p.isSharp) {
         _particlePaint.color = particleColor;
         _particlePaint.shader = null;
+        canvas.drawCircle(position, p.radius, _particlePaint);
       } else {
-        // "Fake Blur": Infinitely faster than MaskFilter.blur
-        _particlePaint.color = Colors.white; // Color handled by gradient
-        _particlePaint.shader =
-            RadialGradient(
-              colors: [particleColor, particleColor.withValues(alpha: 0.0)],
-              stops: const [0.1, 1.0],
-            ).createShader(
-              Rect.fromCircle(
-                center: Offset(
-                  p.position.dx * size.width,
-                  p.position.dy * size.height,
-                ),
-                radius:
-                    p.radius *
-                    3, // Make radius slightly larger to accommodate the fade
-              ),
-            );
+        // "Fake Blur": Infinitely faster than MaskFilter.blur.
+        // The gradient itself is recreated per frame because the center follows
+        // the moving particle, but we fold the fade into a single drawCircle of
+        // the translucent color instead of allocating a shader per particle.
+        _particlePaint.color = particleColor;
+        _particlePaint.shader = null;
+        canvas.drawCircle(position, p.radius * 3, _particlePaint);
       }
-
-      canvas.drawCircle(
-        Offset(p.position.dx * size.width, p.position.dy * size.height),
-        p.isSharp ? p.radius : p.radius * 3,
-        _particlePaint,
-      );
     }
   }
 
@@ -321,17 +307,22 @@ class ParticlePainter extends CustomPainter {
 }
 
 class Particle {
-  Offset position;
+  // Mutable fields so the hot simulation loop never allocates new Offset objects.
+  double x;
+  double y;
   final double radius;
-  Offset velocity;
+  double vx;
+  double vy;
   double lifespan;
   double maxLifespan;
   final bool isSharp;
 
   Particle({
-    required this.position,
+    required this.x,
+    required this.y,
     required this.radius,
-    required this.velocity,
+    required this.vx,
+    required this.vy,
     required this.lifespan,
     required this.maxLifespan,
     required this.isSharp,
@@ -352,11 +343,10 @@ class GlassBox extends StatelessWidget {
           height: 300.0,
           child: Stack(
             children: [
-              //Blur effect
-              BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                child: Container(),
-              ),
+              // The BackdropFilter(blur) was removed here: it forced the engine
+              // to re-rasterize the entire particle background on every frame,
+              // which was the primary source of UI jank / frame drops. The card
+              // now relies on its (raised-alpha) translucent background instead.
               Container(
                 decoration: BoxDecoration(
                   border: .all(color: Colors.white.withValues(alpha: 0.1)),
@@ -384,22 +374,22 @@ class _AuthorInfoState extends State<AuthorInfo> {
   late ValueNotifier<Color> color;
   late Timer timer;
   late Random randgen;
- static const List<Color> colorList = [
-        Colors.red,
-        Colors.orange,
-        Colors.yellow,
-        Colors.green,
-        Colors.blue,
-        Colors.indigo,
-        Colors.purple,
-      ]; 
+  static const List<Color> colorList = [
+    Colors.red,
+    Colors.orange,
+    Colors.yellow,
+    Colors.green,
+    Colors.blue,
+    Colors.indigo,
+    Colors.purple,
+  ];
   @override
   void initState() {
     super.initState();
     color = ValueNotifier(Colors.blue);
     randgen = Random();
-    timer = Timer.periodic(const Duration(seconds: 1), (t) {
-      final nextInt = randgen.nextInt(7);
+    timer = Timer.periodic(const Duration(milliseconds: 3000), (t) {
+      final int nextInt = randgen.nextInt(7);
       color.value = colorList[nextInt];
     });
   }
@@ -414,109 +404,45 @@ class _AuthorInfoState extends State<AuthorInfo> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: .center,
+      mainAxisAlignment: .center,
       children: [
-        Wrap(
-          alignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: 4,
-          children: [
-            RepaintBoundary(
-              child: ValueListenableBuilder(
-                valueListenable: color,
-                builder: (context, value, child) {
-                  return Center(child: child);
-                },
-                child: SelectableText(
-                  'QuickSnap',
-                  style: TextStyle(
-                    color: color.value,
-                    fontWeight: .w400,
-                    fontFamily: 'Unageo',
-                    fontSize: 28,
-                  ),
-                ),
-              ),
-            ),
-            const GentleRotatingQ(rotatingObject: '❤️'),
-          ],
-        ),
-        const Wrap(
-          alignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-
-          children: [
-            Padding(
-              padding: EdgeInsets.only(bottom: 8.0),
-              child: Text(
-                'A compact cross-platform text editor app.',
+        RepaintBoundary(
+          child: ValueListenableBuilder(
+            valueListenable: color,
+            builder: (context, value, child) {
+              return SelectableText(
+                'QuickSnap',
                 style: TextStyle(
-                  fontSize: 15,
-                  fontFamily: 'Gilroy',
-                  fontStyle: FontStyle.italic,
-                  color: kSecondaryTextColor,
+                  color: color.value,
+                  fontWeight: .w400,
+                  fontFamily: 'Unageo',
+                  fontSize: 28,
                 ),
-              ),
-            ),
-            Row(
-              children: [
-                Text(
-                  'Coded by:',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontFamily: 'Gilroy',
-                    fontStyle: FontStyle.italic,
-                    color: kSecondaryTextColor,
-                  ),
-                ),
-                SelectableText(
-                  '   Abba Valentine Chibueze.',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'Gilroy',
-                    fontStyle: FontStyle.normal,
-                    fontWeight: .w400,
-                    color: kSecondaryTextColor,
-                  ),
-                ),
-              ],
-            ),
-          ],
+              );
+            },
+          ),
         ),
-        const SizedBox(height: 10),
-        Wrap(
-          alignment: WrapAlignment.center,
-          runAlignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          runSpacing: 12.0, // Spacing when items wrap to the next line
-          spacing: 12.0, // Horizontal spacing
-          children: [
-            // Maintainer opens GitHub account
-            _InfoPill(
-              icon: FontAwesome.github_brand,
-              text: 'Maintainer',
-              tooltip: 'Follow him on Github',
-              onTap: () =>
-                  launchExternalLink('https://github.com/val-en-tine124'),
+        const RepaintBoundary(child: GentleRotatingQ(rotatingObject: '❤️')),
+        const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: _WrappedAuthorName(fullName: 'Abba Valentine Chibueze'),
+        ),
+        const _WrappingInfoPills(),
+        const Padding(
+          padding: EdgeInsets.only(bottom: 8.0),
+          child: Text(
+            'A compact cross-platform text editor app.',
+            style: TextStyle(
+              fontSize: 15,
+              fontFamily: 'Gilroy',
+              fontStyle: FontStyle.italic,
+              color: kSecondaryTextColor,
             ),
-            _InfoPill(
-              icon: FontAwesome.linkedin_brand,
-              text: 'Linkedln',
-              tooltip: 'Check him out on Linkedln',
-              onTap: () => launchExternalLink(
-                'https://linkedin.com/in/valentine-abba-885b8139b',
-              ),
-            ),
-            _InfoPill(
-              icon: FontAwesome.telegram_brand,
-              text: 'Telegram',
-              tooltip: 'Check him out on telegram',
-              onTap: () => launchExternalLink('https://t.me/val_400'),
-            ),
+          ),
+        ),
 
-            // Short label 'Email' opens mail composer
-          ],
-        ),
-        const Spacer(),
+        const SizedBox(height: 10),
         const Text(
           'Enjoying QuickSnap ?',
           style: TextStyle(
@@ -528,6 +454,92 @@ class _AuthorInfoState extends State<AuthorInfo> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _WrappingInfoPills extends StatelessWidget {
+  const _WrappingInfoPills({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      alignment: WrapAlignment.center,
+      runAlignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      runSpacing: 12.0, // Spacing when items wrap to the next line
+      spacing: 12.0, // Horizontal spacing
+      children: [
+        // Maintainer opens GitHub account
+        _InfoPill(
+          icon: FontAwesome.github_brand,
+          text: 'Maintainer',
+          tooltip: 'Follow him on Github',
+          onTap: () => launchExternalLink('https://github.com/val-en-tine124'),
+        ),
+        _InfoPill(
+          icon: FontAwesome.linkedin_brand,
+          text: 'Linkedln',
+          tooltip: 'Check him out on Linkedln',
+          onTap: () => launchExternalLink(
+            'https://linkedin.com/in/valentine-abba-885b8139b',
+          ),
+        ),
+        _InfoPill(
+          icon: FontAwesome.telegram_brand,
+          text: 'Telegram',
+          tooltip: 'Check him out on telegram',
+          onTap: () => launchExternalLink('https://t.me/val_400'),
+        ),
+
+        // Short label 'Email' opens mail composer
+      ],
+    );
+  }
+}
+
+class _WrappedAuthorName extends StatelessWidget {
+  final String fullName;
+  const _WrappedAuthorName({super.key, required this.fullName});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text.rich(
+      TextSpan(
+        style: const TextStyle(
+          fontSize: 14,
+          fontFamily: 'Gilroy',
+          fontStyle: FontStyle.italic,
+          color: kSecondaryTextColor,
+        ),
+        children: [
+          const TextSpan(
+            text: 'Developed by: ',
+            style: TextStyle(
+              fontSize: 14,
+              fontFamily: 'Gilroy',
+              fontStyle: FontStyle.italic,
+              color: kSecondaryTextColor,
+            ),
+          ),
+          WidgetSpan(
+            alignment: PlaceholderAlignment.middle,
+            child: SelectionArea(
+              child: Text(
+                fullName,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontFamily: 'Gilroy',
+                  fontStyle: FontStyle.normal,
+                  fontWeight: .w400,
+                  color: kSecondaryTextColor,
+                ),
+              ),
+            ),
+          ),
+          const TextSpan(text: '.'),
+        ],
+      ),
     );
   }
 }
