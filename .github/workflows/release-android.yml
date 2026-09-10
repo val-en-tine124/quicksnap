@@ -66,6 +66,31 @@ jobs:
           # Use UTF-8 without BOM — Java's Properties.load() chokes on BOM
           [System.IO.File]::WriteAllText("android\key.properties", $props, [System.Text.UTF8Encoding]::new($false))
 
+      - name: Auto-bump build number in pubspec
+        shell: powershell
+        run: |
+          $file = "pubspec.yaml"
+          $content = Get-Content $file
+          $updated = $content | ForEach-Object {
+              if ($_ -match '^(version:\s*[0-9\.]+\+)(\d+)$') {
+                  $newBuild = [int]$matches[2] + 1
+                  Write-Host "Bumping build number to $newBuild"
+                  "$($matches[1])$newBuild"
+              } else {
+                  $_
+              }
+          }
+          Set-Content -Path $file -Value $updated -Encoding UTF8
+
+      - name: Commit and Push bumped version
+        shell: bash
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add pubspec.yaml
+          git commit -m "chore: auto-bump build number [skip ci]"
+          git push
+
       - name: Build App files
         run: flutter build apk --release --split-per-abi --build-number ${{github.run_number}}
 
