@@ -55,7 +55,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add pubspec.yaml
-          git commit -m "chore: auto-bump build number [skip ci]"
+          git commit -m "ignore: auto-bump build number [skip ci]"
           git push
 
       - name: Extract bumped version from pubspec.yaml
@@ -106,9 +106,9 @@ jobs:
       - name: Rename APK files
         shell: powershell
         run: |
-          Rename-Item -Path "build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk" -NewName "quicksnap_android_v$env:VERSION+$env:BUILD_NUMBER_armeabi-v7a.apk"
-          Rename-Item -Path "build/app/outputs/flutter-apk/app-arm64-v8a-release.apk" -NewName "quicksnap_android_v$env:VERSION+$env:BUILD_NUMBER_arm64-v8a.apk"
-          Rename-Item -Path "build/app/outputs/flutter-apk/app-x86_64-release.apk" -NewName "quicksnap_android_v$env:VERSION+$env:BUILD_NUMBER_x86_64.apk"
+          Rename-Item -Path "build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk" -NewName "quicksnap_android_v$($env:VERSION)+$($env:BUILD_NUMBER)_armeabi-v7a.apk"
+          Rename-Item -Path "build/app/outputs/flutter-apk/app-arm64-v8a-release.apk" -NewName "quicksnap_android_v$($env:VERSION)+$($env:BUILD_NUMBER)_arm64-v8a.apk"
+          Rename-Item -Path "build/app/outputs/flutter-apk/app-x86_64-release.apk" -NewName "quicksnap_android_v$($env:VERSION)+$($env:BUILD_NUMBER)_x86_64.apk"
 
       - name: Create build-number.txt file
         shell: powershell
@@ -128,7 +128,7 @@ jobs:
         id: github_release_notes
         uses: mikepenz/release-changelog-builder-action@v6
         with:
-          mode: "HYBRID"
+          mode: "COMMIT"
           configuration: ".github/configuration.json"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
